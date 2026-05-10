@@ -228,9 +228,26 @@ jobs:
           name: doc-quality-report
           path: ci-reports/doc-quality-report.txt
 
+  detect-e2e:
+    # ジョブレベル if では hashFiles() が使えないため、checkout 後にシェルで存在判定し
+    # 結果を outputs として後続ジョブに伝搬する（GitHub Actions の式評価制約への対応）
+    runs-on: ubuntu-latest
+    outputs:
+      has_e2e: ${{ steps.check.outputs.has_e2e }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        run: |
+          if [ -f "e2e/package.json" ]; then
+            echo "has_e2e=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_e2e=false" >> "$GITHUB_OUTPUT"
+          fi
+
   e2e-playwright:
+    needs: [detect-e2e]
     if: |
-      hashFiles('e2e/package.json') != '' &&
+      needs.detect-e2e.outputs.has_e2e == 'true' &&
       (github.event_name == 'pull_request' ||
        github.ref == 'refs/heads/main' ||
        github.ref == 'refs/heads/develop')
