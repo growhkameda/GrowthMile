@@ -1,6 +1,6 @@
 ---
 title: "テストエビデンス"
-project: "PreZen"
+project: "GROWTH MILE"
 date: "YYYY-MM-DD"
 host: "ホスト名"
 git_branch: "ブランチ名"

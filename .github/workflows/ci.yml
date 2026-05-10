@@ -19,8 +19,8 @@ permissions:
 env:
   # Next.js ビルド・Lint で env 検証が走る場合のフォールバック（DB 接続は不要なフェーズ向け）
   DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
-  NEXTAUTH_SECRET: ci-placeholder-secret-at-least-32-chars
-  NEXTAUTH_URL: http://localhost:3000
+  AUTH_SECRET: ci-placeholder-secret-at-least-32-chars
+  AUTH_URL: http://localhost:3000
   NODE_ENV: development
 
 jobs:
@@ -129,7 +129,7 @@ jobs:
             check_sections "docs/features/requirements.md" "概要"
           fi
           if [ "$EXIT_CODE" -ne 0 ]; then
-            echo "必須セクションが不足しています。docs.mdc のルールを確認してください。"
+            echo "必須セクションが不足しています。.claude/rules/docs.md のルールを確認してください。"
             exit 1
           fi
           echo "構造チェック：OK"
@@ -246,8 +246,8 @@ jobs:
           POSTGRES_DB: ${{ secrets.CI_DB_NAME }}
     env:
       DATABASE_URL: postgresql://${{ secrets.CI_DB_USER }}:${{ secrets.CI_DB_PASSWORD }}@db:5432/${{ secrets.CI_DB_NAME }}
-      NEXTAUTH_URL: http://localhost:3000
-      NEXTAUTH_SECRET: ${{ secrets.CI_NEXTAUTH_SECRET }}
+      AUTH_URL: http://localhost:3000
+      AUTH_SECRET: ${{ secrets.CI_NEXTAUTH_SECRET }}
       NODE_ENV: test
       CI: "true"
     steps:

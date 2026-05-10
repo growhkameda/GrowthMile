@@ -23,14 +23,12 @@ $docs = @(
     "docs/spec-db.md",
     "docs/security.md",
     "docs/database_design.md",
-    "docs/frontend_structure.md",
-    "docs/backend_structure.md",
     "docs/features/requirements.md"
 )
 
 Write-Host ""
 Write-Host "========================================"
-Write-Host "  PreZen 設計書 一括PDF変換"
+Write-Host "  GROWTH MILE 設計書 一括PDF変換"
 Write-Host "========================================"
 Write-Host ""
 

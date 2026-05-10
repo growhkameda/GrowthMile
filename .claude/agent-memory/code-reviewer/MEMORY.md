@@ -1,0 +1,4 @@
+- [Auth.js v5 edge-split pattern](project_authjs_v5_edge_split.md) — middleware が Prisma Adapter を import すると Edge Runtime 警告。auth.config.ts に分離する公式パターンを推奨。
+- [Env var migration NEXTAUTH→AUTH](project_env_var_authjs_migration.md) — v5 では AUTH_SECRET/AUTH_URL が公式。src/env.ts はフォールバック実装済みだが CI・docs に旧名が残りやすい。
+- [Doc-implementation drift check](feedback_doc_implementation_drift.md) — src/env.ts や schema を変えたら CI ワークフロー・docs/agentic/・docs/architecture/ も同時更新されているか必ず確認する。
+- [Review scope discipline](feedback_review_scope_discipline.md) — ユーザーがスコープを切った場合は判定をスコープ内に絞り、out-of-scope 残骸は Notes で言及のみ。

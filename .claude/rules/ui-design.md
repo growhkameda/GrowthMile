@@ -6,7 +6,7 @@ alwaysApply: false
 
 # UI Design Rules
 
-AIがReactコンポーネントを生成・編集する際は、必ず以下のルールに従うこと。
+Claude Code が React コンポーネントを生成・編集する際は、必ず以下のルールに従うこと。
 詳細なデザイントークンの定義は `docs/design/spec-design-system.md` を参照。
 
 ## 必須事項

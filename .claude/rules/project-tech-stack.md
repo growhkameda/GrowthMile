@@ -10,8 +10,8 @@ alwaysApply: true
 
 - **フレームワーク**: Next.js 16 (App Router) / TypeScript
 - **スタイリング**: Tailwind CSS v4
-- **ORM**: Prisma（型は自動生成を必ず使用。`any` 禁止）
-- **認証**: NextAuth.js (Auth.js v5)
+- **ORM**: Prisma 7（型は自動生成を必ず使用。`any` 禁止）
+- **認証**: Auth.js v5（NextAuth.js v5 beta）
 - **DB**: PostgreSQL
 - **バリデーション**: Zod（API Routes / Server Actions / env 全入力に必須）
 - **UIグローバル状態**: Zustand（モーダル・通知等の純粋 UI 状態のみ。サーバー状態は使用禁止）
@@ -47,11 +47,6 @@ alwaysApply: true
 - 型定義だけでは表現できない制約・API 仕様・バリデーション条件はコメントで補足する
 - 複雑な非同期処理・副作用には処理の意図をインラインコメントで説明する
 
-<!-- ============================================================
-  以下はプロジェクト固有のパターンです。
-  発見した落とし穴や必須パターンを随時追記してください。
-============================================================ -->
-
 ## プロジェクト固有パターン
 
 ### Server Components / Client Components の境界
@@ -59,7 +54,6 @@ alwaysApply: true
 `"use client"` ディレクティブは必要最小限にとどめること。
 
 **理由**: Client Components が増えるとバンドルサイズが増大し、Server-side Rendering の恩恵を失う。
-状態管理・イベントハンドラが不要なコンポーネントは Server Components として実装すること。
 
 ```tsx
 // NG: 不要な "use client"（静的なコンポーネントで使用）
@@ -74,7 +68,7 @@ export function StaticCard({ title }: { title: string }) {
 }
 ```
 
-### NextAuth.js セッション取得パターン
+### Auth.js v5 セッション取得パターン
 
 Server Components では `auth()` を直接呼び出し、Client Components では `useSession()` を使用すること。
 
@@ -89,18 +83,22 @@ export default async function ProtectedPage() {
 }
 ```
 
-### middleware.ts による Route 保護
+### proxy.ts による Route 保護（Auth.js v5 推奨パターン）
 
-認証が必要なルートは `middleware.ts` で一括保護すること。
+認証が必要なルートは `src/proxy.ts`（または過渡的に `src/middleware.ts`）で一括保護すること。
+Edge Runtime の制約上、Prisma を含む完全な Auth 設定は使用できないため、`src/auth.config.ts`（Edge 互換の軽量設定）を使用する。
 
 **理由**: 各ページに個別でセッションチェックを書くと漏れが発生する。
 
 ```ts
-// middleware.ts
-export { auth as middleware } from "@/lib/auth"
+// src/middleware.ts（現在の実装）
+import NextAuth from "next-auth"
+import { authConfig } from "@/auth.config"
+
+export default NextAuth(authConfig).auth
 
 export const config = {
-  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|login).*)"],
+  matcher: ["/dashboard/:path*"],
 }
 ```
 
@@ -110,13 +108,13 @@ export const config = {
 
 ```ts
 // src/lib/db.ts
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient } from "@/generated/prisma"
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient()
+export const db = globalForPrisma.prisma ?? new PrismaClient()
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db
 ```
 
 ### API Routes のレスポンス型
@@ -160,54 +158,10 @@ export async function POST(request: Request) {
 イイネ・フォロー等のサーバー状態変更は `useOptimistic` で即時 UI 反映し、Server Action で DB 更新すること。
 Zustand をサーバー状態管理に使わないこと。
 
-**理由**: Zustand はキャッシュ無効化・再フェッチの仕組みを持たず、サーバー状態と UI が乖離する。
-
-```tsx
-"use client"
-import { useOptimistic, useTransition } from "react"
-import { toggleLike } from "@/features/like/actions"
-
-export function LikeButton({ postId, initialCount, initialLiked }: LikeButtonProps) {
-  const [isPending, startTransition] = useTransition()
-  const [optimistic, setOptimistic] = useOptimistic(
-    { count: initialCount, liked: initialLiked },
-    (state, liked: boolean) => ({ count: state.count + (liked ? 1 : -1), liked })
-  )
-
-  function handleClick() {
-    startTransition(async () => {
-      setOptimistic(!optimistic.liked)
-      await toggleLike(postId)
-    })
-  }
-
-  return (
-    <button onClick={handleClick} disabled={isPending}>
-      {optimistic.liked ? "♥" : "♡"} {optimistic.count}
-    </button>
-  )
-}
-```
-
-### Zustand の使用スコープ
-
-Zustand はサーバーデータを持たない純粋な UI 状態管理のみに使うこと。
-
-```ts
-// OK: モーダル・通知・UI 設定
-interface UIStore {
-  isModalOpen: boolean
-  openModal: () => void
-  closeModal: () => void
-}
-
-// NG: イイネ数・投稿リスト等のサーバーデータを Zustand で管理
-```
-
 ### 環境変数バリデーション（t3-env パターン）
 
 `src/env.ts` で環境変数を Zod スキーマで定義し、起動時に型チェックすること。
-未定義・型違いの環境変数で本番デプロイが壊れる事故を防ぐ。
+Auth.js v5 では `AUTH_SECRET` / `AUTH_URL` を使用（旧 `NEXTAUTH_SECRET` / `NEXTAUTH_URL` は使用しない）。
 
 ```ts
 // src/env.ts
@@ -217,15 +171,23 @@ import { z } from "zod"
 export const env = createEnv({
   server: {
     DATABASE_URL: z.string().url(),
-    NEXTAUTH_SECRET: z.string().min(32),
+    AUTH_SECRET: z.string().min(32),
+    AUTH_URL: z.string().url().optional(),
   },
-  client: {
-    NEXT_PUBLIC_APP_URL: z.string().url().optional(),
-  },
-  runtimeEnv: {
-    DATABASE_URL: process.env.DATABASE_URL,
-    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-  },
+  ...
+})
+```
+
+### Prisma 7 設定ファイル
+
+Prisma 7 では `schema.prisma` の datasource ブロックに `url` を書かず、`prisma.config.ts` で管理する。
+
+```ts
+// prisma.config.ts
+import { defineConfig } from "prisma/config"
+
+export default defineConfig({
+  schema: "prisma/schema.prisma",
+  datasource: { url: process.env["DATABASE_URL"] },
 })
 ```

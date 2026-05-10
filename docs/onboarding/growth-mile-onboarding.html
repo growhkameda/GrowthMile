@@ -1,0 +1,2273 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GROWTH MILE 開発参加オンボーディング</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --surface: #f8fafc;
+        --surface-2: #f1f5f9;
+        --text: #0f172a;
+        --muted: #64748b;
+        --border: #cbd5e1;
+        --accent-blue: #2563eb;
+        --accent-blue-bg: #dbeafe;
+        --accent-green: #166534;
+        --accent-green-bg: #dcfce7;
+        --accent-orange: #92400e;
+        --accent-orange-bg: #fed7aa;
+        --code-bg: #0f172a;
+        --code-text: #e2e8f0;
+        --kw: #93c5fd;
+        --tb: #86efac;
+        --str: #fdba74;
+        --num: #fca5a5;
+        --cm: #94a3b8;
+        --op: #c4b5fd;
+        --fn: #f0abfc;
+        --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      }
+      [data-theme="dark"] {
+        --bg: #0b1220;
+        --surface: #111a2e;
+        --surface-2: #1a2540;
+        --text: #e6eefc;
+        --muted: #94a3b8;
+        --border: #2a3550;
+        --accent-blue: #60a5fa;
+        --accent-blue-bg: rgba(59, 130, 246, 0.15);
+        --accent-green: #4ade80;
+        --accent-green-bg: rgba(34, 197, 94, 0.15);
+        --accent-orange: #fbbf24;
+        --accent-orange-bg: rgba(251, 191, 36, 0.15);
+        --code-bg: #060c1c;
+        --code-text: #e2e8f0;
+        --kw: #93c5fd;
+        --tb: #86efac;
+        --str: #fdba74;
+        --num: #fca5a5;
+        --cm: #64748b;
+        --op: #c4b5fd;
+        --fn: #f0abfc;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN",
+          "Yu Gothic UI", Meiryo, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        transition:
+          background 0.3s,
+          color 0.3s;
+      }
+
+      .progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        width: 0;
+        background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+        z-index: 100;
+        transition: width 0.3s ease;
+      }
+
+      .slide-wrapper {
+        width: 100vw;
+        height: calc(100vh - 64px);
+        position: relative;
+      }
+      .slide {
+        position: absolute;
+        inset: 0;
+        padding: 28px 52px 20px;
+        display: none;
+        flex-direction: column;
+        gap: 14px;
+        overflow-y: auto;
+      }
+      .slide.active {
+        display: flex;
+      }
+
+      h1 {
+        font-size: 36px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      h2 {
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      h3 {
+        font-size: 19px;
+        font-weight: 700;
+      }
+      h4 {
+        font-size: 16px;
+        font-weight: 700;
+      }
+      p {
+        font-size: 15px;
+        color: var(--text);
+      }
+      .muted {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .slide-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        justify-content: space-between;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+      }
+      .slide-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .slide-header h2 {
+        margin: 0;
+      }
+      .slide-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+      .badge-blue {
+        background: var(--accent-blue-bg);
+        color: var(--accent-blue);
+      }
+      .badge-green {
+        background: var(--accent-green-bg);
+        color: var(--accent-green);
+      }
+      .badge-orange {
+        background: var(--accent-orange-bg);
+        color: var(--accent-orange);
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+      .grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .card-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+      }
+      .card-title svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .info-box {
+        border-radius: 10px;
+        padding: 12px 14px;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        font-size: 14px;
+        border: 1px solid;
+      }
+      .info-box svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+      .info-box.tip {
+        background: var(--accent-green-bg);
+        border-color: var(--accent-green);
+        color: var(--accent-green);
+      }
+      .info-box.note {
+        background: var(--accent-blue-bg);
+        border-color: var(--accent-blue);
+        color: var(--accent-blue);
+      }
+      .info-box.warn {
+        background: var(--accent-orange-bg);
+        border-color: var(--accent-orange);
+        color: var(--accent-orange);
+      }
+      .info-box strong {
+        display: block;
+        margin-bottom: 2px;
+      }
+
+      .code-block {
+        position: relative;
+        background: var(--code-bg);
+        color: var(--code-text);
+        border-radius: 10px;
+        padding: 14px 16px;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        font-size: 13.5px;
+        line-height: 1.65;
+        white-space: pre-wrap;
+        word-break: break-word;
+        overflow-x: auto;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .code-block .label {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        font-size: 11px;
+        color: #94a3b8;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .kw {
+        color: var(--kw);
+      }
+      .tb {
+        color: var(--tb);
+      }
+      .str {
+        color: var(--str);
+      }
+      .num {
+        color: var(--num);
+      }
+      .cm {
+        color: var(--cm);
+        font-style: italic;
+      }
+      .op {
+        color: var(--op);
+      }
+      .fn {
+        color: var(--fn);
+      }
+
+      .step-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .step-list li {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      .step-num {
+        flex-shrink: 0;
+        width: 28px;
+        height: 28px;
+        background: var(--accent-blue);
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .step-content {
+        flex: 1;
+      }
+      .step-content h4 {
+        margin-bottom: 2px;
+      }
+      .step-content p {
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .os-tabs {
+        display: flex;
+        gap: 0;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 8px;
+      }
+      .os-tab {
+        padding: 8px 16px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        border-bottom: 2px solid transparent;
+        color: var(--muted);
+        transition: all 0.2s;
+      }
+      .os-tab.active {
+        color: var(--accent-blue);
+        border-color: var(--accent-blue);
+      }
+
+      .kbd {
+        display: inline-block;
+        padding: 1px 6px;
+        border-radius: 4px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        font-family: monospace;
+        font-size: 12px;
+      }
+
+      .tag {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 6px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        font-family: monospace;
+        font-size: 12px;
+        color: var(--text);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      th,
+      td {
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+      }
+      th {
+        background: var(--surface-2);
+        font-weight: 700;
+        font-size: 13px;
+      }
+      td code {
+        font-family: monospace;
+        color: var(--accent-blue);
+      }
+
+      .check-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .check-list li {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        font-size: 14px;
+      }
+      .check-list svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+        color: var(--accent-green);
+        margin-top: 1px;
+      }
+
+      .practice-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        background: var(--accent-orange-bg);
+        border-left: 4px solid var(--accent-orange);
+        border-radius: 6px;
+      }
+      .practice-header svg {
+        width: 20px;
+        height: 20px;
+        color: var(--accent-orange);
+      }
+      .practice-header h3 {
+        color: var(--accent-orange);
+      }
+
+      .answer-toggle-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--surface-2);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 6px 14px;
+        font-size: 13px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .answer-toggle-btn:hover {
+        background: var(--accent-blue-bg);
+        border-color: var(--accent-blue);
+        color: var(--accent-blue);
+      }
+      .answer-toggle-btn .at-chevron {
+        transition: transform 0.2s;
+        width: 14px;
+        height: 14px;
+      }
+      .answer-toggle-btn.open .at-chevron {
+        transform: rotate(180deg);
+      }
+      .answer-body {
+        display: none;
+      }
+      .answer-body.open {
+        display: block;
+        margin-top: 8px;
+      }
+
+      .nav-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 64px;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        z-index: 50;
+      }
+      .nav-center {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .slide-counter {
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .dot-nav {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        max-width: 60vw;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--border);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .dot:hover {
+        background: var(--accent-blue);
+      }
+      .dot.active {
+        background: var(--accent-blue);
+        width: 24px;
+        border-radius: 4px;
+      }
+
+      .nav-btn {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--text);
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s;
+      }
+      .nav-btn:hover:not(:disabled) {
+        background: var(--accent-blue);
+        color: #fff;
+        border-color: var(--accent-blue);
+      }
+      .nav-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      .theme-btn {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 6px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+      }
+      .theme-btn svg {
+        width: 16px;
+        height: 16px;
+      }
+      .theme-btn:hover {
+        background: var(--surface-2);
+      }
+
+      .title-slide {
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+      }
+      .title-slide h1 {
+        font-size: 56px;
+        background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 12px;
+      }
+      .title-slide .subtitle {
+        font-size: 22px;
+        color: var(--muted);
+        margin-bottom: 24px;
+      }
+      .title-slide .meta {
+        display: flex;
+        gap: 18px;
+        margin-top: 12px;
+      }
+
+      .agenda-card {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 18px;
+      }
+      .agenda-card .num {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--accent-blue);
+        line-height: 1;
+      }
+      .agenda-card.green .num {
+        color: var(--accent-green);
+      }
+      .agenda-card.orange .num {
+        color: var(--accent-orange);
+      }
+
+      .icon-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        font-size: 14px;
+      }
+      .icon-row svg {
+        width: 16px;
+        height: 16px;
+        color: var(--accent-blue);
+        flex-shrink: 0;
+      }
+
+      .branch-flow {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 16px;
+        background: var(--surface-2);
+        border-radius: 10px;
+        flex-wrap: wrap;
+      }
+      .branch-pill {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-family: monospace;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .branch-pill.main {
+        background: var(--accent-blue-bg);
+        color: var(--accent-blue);
+      }
+      .branch-pill.feature {
+        background: var(--accent-green-bg);
+        color: var(--accent-green);
+      }
+      .branch-pill.pr {
+        background: var(--accent-orange-bg);
+        color: var(--accent-orange);
+      }
+      .arrow {
+        color: var(--muted);
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body data-theme="dark">
+    <svg style="display: none" xmlns="http://www.w3.org/2000/svg">
+      <symbol
+        id="icon-rocket"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path
+          d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"
+        />
+        <path
+          d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"
+        />
+        <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+        <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+      </symbol>
+      <symbol
+        id="icon-bulb"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M9 18h6" />
+        <path d="M10 22h4" />
+        <path
+          d="M12 2a7 7 0 0 0-7 7c0 2.5 1 4 2 5.5.5.7 1 1.5 1 2.5h8c0-1 .5-1.8 1-2.5 1-1.5 2-3 2-5.5a7 7 0 0 0-7-7z"
+        />
+      </symbol>
+      <symbol
+        id="icon-warn"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path
+          d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+        />
+        <line x1="12" y1="9" x2="12" y2="13" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
+      </symbol>
+      <symbol
+        id="icon-info"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="16" x2="12" y2="12" />
+        <line x1="12" y1="8" x2="12.01" y2="8" />
+      </symbol>
+      <symbol
+        id="icon-check"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="20 6 9 17 4 12" />
+      </symbol>
+      <symbol
+        id="icon-pencil"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+      </symbol>
+      <symbol
+        id="icon-target"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <circle cx="12" cy="12" r="6" />
+        <circle cx="12" cy="12" r="2" />
+      </symbol>
+      <symbol
+        id="icon-sun"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="5" />
+        <line x1="12" y1="1" x2="12" y2="3" />
+        <line x1="12" y1="21" x2="12" y2="23" />
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+        <line x1="1" y1="12" x2="3" y2="12" />
+        <line x1="21" y1="12" x2="23" y2="12" />
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+      </symbol>
+      <symbol
+        id="icon-moon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+      </symbol>
+      <symbol
+        id="icon-clock"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </symbol>
+      <symbol
+        id="icon-user"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </symbol>
+      <symbol
+        id="icon-chevron"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="6 9 12 15 18 9" />
+      </symbol>
+      <symbol
+        id="icon-terminal"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="4 17 10 11 4 5" />
+        <line x1="12" y1="19" x2="20" y2="19" />
+      </symbol>
+      <symbol
+        id="icon-folder"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+      </symbol>
+      <symbol
+        id="icon-branch"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="6" y1="3" x2="6" y2="15" />
+        <circle cx="18" cy="6" r="3" />
+        <circle cx="6" cy="18" r="3" />
+        <path d="M18 9a9 9 0 0 1-9 9" />
+      </symbol>
+      <symbol
+        id="icon-shield"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      </symbol>
+    </svg>
+
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div class="slide-wrapper" id="slideWrapper">
+      <!-- 1: タイトル -->
+      <div class="slide title-slide active">
+        <div class="badge badge-blue">
+          <svg><use href="#icon-rocket" /></svg>
+          ONBOARDING GUIDE
+        </div>
+        <h1>GROWTH MILE<br />開発参加オンボーディング</h1>
+        <p class="subtitle">環境構築から最初のPRを出すまで、丁寧に解説します</p>
+        <div class="meta">
+          <span class="badge badge-green"
+            ><svg><use href="#icon-clock" /></svg> 所要時間: 約60分</span
+          >
+          <span class="badge badge-orange"
+            ><svg><use href="#icon-user" /></svg> 対象: 開発初心者〜</span
+          >
+        </div>
+      </div>
+
+      <!-- 2: アジェンダ -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-blue">AGENDA</span>
+            <h2>今日のゴール</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <p>
+            ローカルでGROWTH
+            MILEを起動し、初めてのコミット＆プルリクを出せる状態になることがゴールです。
+          </p>
+          <div class="grid-3">
+            <div class="card agenda-card">
+              <div class="num">01</div>
+              <h3>環境構築</h3>
+              <p class="muted">
+                必要ツールのインストール、リポジトリ取得、ローカルDB起動、開発サーバー起動まで
+              </p>
+              <span class="tag">約30分</span>
+            </div>
+            <div class="card agenda-card green">
+              <div class="num">02</div>
+              <h3>Git運用フロー</h3>
+              <p class="muted">ブランチ命名、コミット規約 (Conventional Commits)、PRの出し方</p>
+              <span class="tag">約15分</span>
+            </div>
+            <div class="card agenda-card orange">
+              <div class="num">03</div>
+              <h3>コーディング規約</h3>
+              <p class="muted">命名規則、any禁止、"use client"の使い方、Lint/Format/Testの回し方</p>
+              <span class="tag">約15分</span>
+            </div>
+          </div>
+          <div class="info-box note">
+            <svg><use href="#icon-info" /></svg>
+            <div>
+              <strong>進め方</strong>キーボードの矢印キー <span class="kbd">←</span>
+              <span class="kbd">→</span>
+              または画面下のボタンでスライドを進められます。右下のアイコンでライト/ダーク切替が可能です。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3: 必要ツール一覧 -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-blue">SECTION 1 — 1/9</span>
+            <h2>必要なツールの全体像</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <p>下記のツールをインストールします。すでに入っているものはスキップしてOKです。</p>
+          <div class="grid-4">
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-branch" /></svg>Git
+              </div>
+              <p class="muted">ソースコードのバージョン管理。必須。</p>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-terminal" /></svg>Node.js 20.x LTS
+              </div>
+              <p class="muted">Next.jsの実行環境。npmが同梱されます。</p>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-folder" /></svg>Docker Desktop
+              </div>
+              <p class="muted">ローカルでPostgreSQLを起動するために使用。</p>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-pencil" /></svg>VS Code
+              </div>
+              <p class="muted">推奨エディタ。拡張機能を後ほど入れます。</p>
+            </div>
+          </div>
+          <div class="info-box tip">
+            <svg><use href="#icon-bulb" /></svg>
+            <div>
+              <strong>初学者の方へ</strong
+              >「ツールを入れる」と聞くと身構えがちですが、ほとんどがインストーラをダウンロードしてダブルクリック→次へ次へ、で完了します。一緒にゆっくり進めましょう。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4: Git のインストール -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-blue">SECTION 1 — 2/9</span>
+            <h2>Git のインストール</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-info" /></svg>Windows
+              </div>
+              <ul class="step-list">
+                <li>
+                  <div class="step-num">1</div>
+                  <div class="step-content">
+                    <h4>公式サイトを開く</h4>
+                    <p>https://git-scm.com/download/win</p>
+                  </div>
+                </li>
+                <li>
+                  <div class="step-num">2</div>
+                  <div class="step-content">
+                    <h4>インストーラを実行</h4>
+                    <p>
+                      基本は「Next」連打でOK。改行コードは「Checkout as-is, commit
+                      Unix-style」を推奨。
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <div class="step-num">3</div>
+                  <div class="step-content">
+                    <h4>確認</h4>
+                    <p>PowerShellで <span class="tag">git --version</span> が表示されればOK</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-info" /></svg>macOS
+              </div>
+              <ul class="step-list">
+                <li>
+                  <div class="step-num">1</div>
+                  <div class="step-content">
+                    <h4>Homebrewを入れる（任意）</h4>
+                    <p>https://brew.sh の手順を実行</p>
+                  </div>
+                </li>
+                <li>
+                  <div class="step-num">2</div>
+                  <div class="step-content">
+                    <h4>brewでGitを導入</h4>
+                    <p><span class="tag">brew install git</span></p>
+                  </div>
+                </li>
+                <li>
+                  <div class="step-num">3</div>
+                  <div class="step-content">
+                    <h4>確認</h4>
+                    <p>ターミナルで <span class="tag">git --version</span> が表示されればOK</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="label">初期設定（共通）</div>
+            <span class="cm"># 名前とメールを設定（GitHubで使うものに合わせる）</span>
+            git config <span class="op">--global</span> user.name
+            <span class="str">"Your Name"</span> git config
+            <span class="op">--global</span> user.email <span class="str">"you@example.com"</span>
+
+            <span class="cm"># デフォルトブランチを main に</span>
+            git config <span class="op">--global</span> init.defaultBranch main
+          </div>
+        </div>
+      </div>
+
+      <!-- 5: Node.js のインストール -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-blue">SECTION 1 — 3/9</span>
+            <h2>Node.js のインストール</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <p>
+            GROWTH MILEは <strong>Node.js 20.x LTS</strong> 系を使用します。バージョン違いに備えて
+            <strong>nvm</strong> 経由のインストールを推奨します。
+          </p>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-info" /></svg>Windows (nvm-windows)
+              </div>
+              <div class="code-block">
+                <span class="cm"># https://github.com/coreybutler/nvm-windows/releases</span>
+                <span class="cm"># nvm-setup.exe をダウンロードして実行</span>
+
+                nvm install <span class="num">20</span> nvm use <span class="num">20</span> node
+                <span class="op">-v</span> <span class="cm"># v20.x.x</span> npm
+                <span class="op">-v</span>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-info" /></svg>macOS (nvm)
+              </div>
+              <div class="code-block">
+                <span class="cm"># nvm のインストール</span>
+                curl
+                <span class="op">-o-</span>
+                https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh
+                <span class="op">|</span> bash
+
+                <span class="cm"># ターミナルを開き直してから</span>
+                nvm install <span class="num">20</span> nvm use <span class="num">20</span> node
+                <span class="op">-v</span>
+              </div>
+            </div>
+          </div>
+          <div class="info-box warn">
+            <svg><use href="#icon-warn" /></svg>
+            <div>
+              <strong>注意</strong
+              >すでに別バージョンのNode.jsが入っている場合は、いったんアンインストールしてからnvm経由で入れ直すと事故が減ります。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6: Docker Desktop のインストール -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-blue">SECTION 1 — 4/9</span>
+            <h2>Docker Desktop のインストール</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <p>
+            PostgreSQLをローカルマシンに直接入れる代わりに、Docker上で起動します。これによりOSを問わず同じ環境を再現できます。
+          </p>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-info" /></svg>Windows
+              </div>
+              <ul class="step-list">
+                <li>
+                  <div class="step-num">1</div>
+                  <div class="step-content">
+                    <h4>WSL2 を有効化</h4>
+                    <p>PowerShellを管理者で開き <span class="tag">wsl --install</span>。再起動。</p>
+                  </div>
+                </li>
+                <li>
+                  <div class="step-num">2</div>
+                  <div class="step-content">
+                    <h4>Docker Desktop を入れる</h4>
+                    <p>
+                      https://www.docker.com/products/docker-desktop
+                      からダウンロードしてインストール
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <div class="step-num">3</div>
+                  <div class="step-content">
+                    <h4>起動して確認</h4>
+                    <p>クジラのアイコンが出れば成功。 <span class="tag">docker --version</span></p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-info" /></svg>macOS
+              </div>
+              <ul class="step-list">
+                <li>
+                  <div class="step-num">1</div>
+                  <div class="step-content">
+                    <h4>適切な版を選ぶ</h4>
+                    <p>Apple Silicon (M1/M2/M3) か Intel か確認</p>
+                  </div>
+                </li>
+                <li>
+                  <div class="step-num">2</div>
+                  <div class="step-content">
+                    <h4>インストール</h4>
+                    <p>公式サイトのdmgを開きApplicationsへドラッグ</p>
+                  </div>
+                </li>
+                <li>
+                  <div class="step-num">3</div>
+                  <div class="step-content">
+                    <h4>起動して確認</h4>
+                    <p>
+                      メニューバーにクジラが出れば成功。 <span class="tag">docker --version</span>
+                    </p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="info-box tip">
+            <svg><use href="#icon-bulb" /></svg>
+            <div>
+              <strong>豆知識</strong>Docker
+              Desktopは起動していないとDBコンテナが立ち上がりません。PCを再起動した日は「クジラが泳いでるか」を確認する癖をつけましょう。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7: VS Code と推奨拡張 -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-blue">SECTION 1 — 5/9</span>
+            <h2>VS Code と推奨拡張機能</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <p>
+            https://code.visualstudio.com
+            から自分のOS用をダウンロードしインストールします。続いて、コマンドパレット
+            <span class="kbd">Ctrl/Cmd</span>+<span class="kbd">Shift</span>+<span class="kbd"
+              >P</span
+            >
+            から「Extensions: Install Extensions」で以下を入れてください。
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>拡張機能</th>
+                <th>用途</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>dbaeumer.vscode-eslint</code></td>
+                <td>ESLint連携。コード保存時に自動Lint。</td>
+              </tr>
+              <tr>
+                <td><code>esbenp.prettier-vscode</code></td>
+                <td>Prettierでコードを自動整形。</td>
+              </tr>
+              <tr>
+                <td><code>bradlc.vscode-tailwindcss</code></td>
+                <td>Tailwindクラスの補完とプレビュー。</td>
+              </tr>
+              <tr>
+                <td><code>Prisma.prisma</code></td>
+                <td>Prisma schemaの構文ハイライトと補完。</td>
+              </tr>
+              <tr>
+                <td><code>ms-vscode.vscode-typescript-next</code></td>
+                <td>TypeScriptの最新機能サポート。</td>
+              </tr>
+              <tr>
+                <td><code>eamodio.gitlens</code></td>
+                <td>ブレーム表示・履歴可視化。</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="info-box note">
+            <svg><use href="#icon-info" /></svg>
+            <div>
+              <strong>保存時の自動フォーマット</strong>Settings から
+              <code>editor.formatOnSave: true</code>
+              をONにしておくと、規約違反のコミットが激減します。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8: SSHキーの作成 -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-blue">SECTION 1 — 6/9</span>
+            <h2>SSH キーを作って GitHub に登録</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <p>
+            毎回パスワードを入れずにGitHubと通信するため、SSH鍵を作成して登録します（Windows/Mac共通）。
+          </p>
+          <div class="code-block">
+            <div class="label">ターミナル / PowerShell</div>
+            <span class="cm"># 1. 鍵を生成（メールはGitHubアカウントのもの）</span>
+            ssh-keygen <span class="op">-t</span> ed25519 <span class="op">-C</span>
+            <span class="str">"you@example.com"</span>
+            <span class="cm"># 保存場所はEnterでデフォルトでOK、パスフレーズも任意</span>
+
+            <span class="cm"># 2. 公開鍵を表示してコピー</span>
+            <span class="cm"># macOS / Linux:</span>
+            cat ~/.ssh/id_ed25519.pub
+            <span class="cm"># Windows (PowerShell):</span>
+            type $env:USERPROFILE\.ssh\id_ed25519.pub
+
+            <span class="cm"
+              ># 3. GitHub の Settings → SSH and GPG keys → New SSH key に貼り付け</span
+            >
+
+            <span class="cm"># 4. 接続テスト</span>
+            ssh <span class="op">-T</span> git@github.com
+            <span class="cm"># "Hi xxx! You've successfully authenticated..." と出れば成功</span>
+          </div>
+          <div class="info-box warn">
+            <svg><use href="#icon-warn" /></svg>
+            <div>
+              <strong>絶対に公開しないこと</strong>登録するのは
+              <code>id_ed25519.pub</code
+              >（公開鍵）です。<code>id_ed25519</code>（秘密鍵、拡張子なし）は誰にも見せず、SlackやGitHubに貼らないこと。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9: リポジトリのクローン -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-blue">SECTION 1 — 7/9</span>
+            <h2>リポジトリのクローン</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <p>SSH経由でGROWTH MILEのソースコードを取得します。</p>
+          <div class="code-block">
+            <div class="label">ターミナル</div>
+            <span class="cm"># 作業用ディレクトリを作る（場所はお好みで）</span>
+            <span class="kw">cd</span> ~/projects <span class="cm"># 例</span>
+
+            <span class="cm"># SSHでクローン（URLは管理者から共有されたものを使用）</span>
+            git clone git@github.com:&lt;ORG&gt;/GrowthMile.git
+
+            <span class="kw">cd</span> GrowthMile
+
+            <span class="cm"># ブランチ一覧を確認</span>
+            git branch <span class="op">-a</span>
+
+            <span class="cm"># main から切り出すための最新化</span>
+            git checkout main git pull
+          </div>
+          <div class="info-box note">
+            <svg><use href="#icon-info" /></svg>
+            <div>
+              <strong>URLが分からない場合</strong
+              >リポジトリURLはチーム管理者からSlackなどで共有されます。GitHub上の緑色の「Code」ボタン
+              → SSHタブからもコピーできます。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10: 依存パッケージ -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-blue">SECTION 1 — 8/9</span>
+            <h2>依存パッケージのインストール</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <p>
+            ルートとE2Eで別々のpackage.jsonを管理しています。<strong>必ず両方</strong>インストールしてください。
+          </p>
+          <div class="code-block">
+            <div class="label">ルート + E2E</div>
+            <span class="cm"># ルートの依存をインストール</span>
+            npm install
+
+            <span class="cm"># e2e は workspace 外のため個別に</span>
+            <span class="kw">cd</span> e2e npm install <span class="kw">cd</span> ..
+          </div>
+          <div class="info-box warn">
+            <svg><use href="#icon-warn" /></svg>
+            <div>
+              <strong>npm install で失敗するとき</strong>Node.jsのバージョンを確認 (<code
+                >node -v</code
+              >
+              が 20.x か)。違う場合は <code>nvm use 20</code> で切替。それでもダメなら
+              <code>node_modules</code> と <code>package-lock.json</code> を消して再実行。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 11: .env 作成 -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-blue">SECTION 1 — 9/9</span>
+            <h2>環境変数 .env の作成</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <p>
+            リポジトリの <code>.env.example</code> をコピーして
+            <code>.env</code> を作り、必要な値を埋めます。
+          </p>
+          <div class="code-block">
+            <div class="label">.env のひな型</div>
+            <span class="cm"># macOS / Linux</span>
+            cp .env.example .env
+
+            <span class="cm"># Windows (PowerShell)</span>
+            Copy-Item .env.example .env
+          </div>
+          <div class="code-block">
+            <div class="label">.env の主要キー（イメージ）</div>
+            DATABASE_URL=<span class="str"
+              >"postgresql://user:password@localhost:5432/growth_mile_db"</span
+            >
+            NEXTAUTH_URL=<span class="str">"http://localhost:3000"</span> NEXTAUTH_SECRET=<span
+              class="str"
+              >"&lt;openssl rand -base64 32 で生成した値&gt;"</span
+            >
+          </div>
+          <div class="info-box warn">
+            <svg><use href="#icon-warn" /></svg>
+            <div>
+              <strong>秘密情報の扱い</strong><code>.env</code>
+              は絶対にコミットしません（<code>.gitignore</code>済み）。値をSlack等に貼る際もDMやプライベートチャンネルに留めること。値が分からない場合はチームに確認しましょう。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 12: DB起動 -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-green">SECTION 2 — 1/3</span>
+            <h2>ローカルDBの起動とマイグレーション</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <p>
+            PostgreSQLをDockerで起動し、Prismaでスキーマを適用します。Docker
+            Desktopが起動していることを確認してから実行してください。
+          </p>
+          <div class="code-block">
+            <div class="label">ターミナル（リポジトリのルートで）</div>
+            <span class="cm"># 1. PostgreSQLコンテナを起動（バックグラウンド）</span>
+            docker compose up <span class="op">-d</span> db
+
+            <span class="cm"># 2. 起動状況を確認（healthy になればOK）</span>
+            docker compose ps
+
+            <span class="cm"># 3. Prisma マイグレーション適用</span>
+            npx prisma migrate dev
+
+            <span class="cm"># 4. Prisma クライアントのコード生成</span>
+            npx prisma generate
+          </div>
+          <div class="info-box tip">
+            <svg><use href="#icon-bulb" /></svg>
+            <div>
+              <strong>DBを覗きたい</strong><code>npx prisma studio</code>
+              でブラウザのGUIからレコードを見られます。デバッグ時に便利。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 13: 開発サーバー起動 -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-green">SECTION 2 — 2/3</span>
+            <h2>開発サーバーの起動と動作確認</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <p>準備が整ったらNext.jsの開発サーバーを起動します。</p>
+          <div class="code-block">
+            <div class="label">起動</div>
+            npm run dev
+
+            <span class="cm"># 出力に</span>
+            <span class="cm"># ▲ Next.js 16.x</span>
+            <span class="cm"># - Local: http://localhost:3000</span>
+            <span class="cm"># と出たらブラウザで開いてみましょう</span>
+          </div>
+          <div class="info-box note">
+            <svg><use href="#icon-info" /></svg>
+            <div>
+              <strong>ポート競合</strong>3000番が使用中の場合
+              <code>EADDRINUSE</code> が出ます。使っているプロセスを終了するか、
+              <code>PORT=3001 npm run dev</code> で別ポートで起動できます。
+            </div>
+          </div>
+          <div class="info-box tip">
+            <svg><use href="#icon-bulb" /></svg>
+            <div>
+              <strong>ホットリロード</strong
+              >ファイル保存で自動的に画面が更新されます。サーバー再起動はほぼ不要です。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 14: 主要コマンド -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-green">SECTION 2 — 3/3</span>
+            <h2>覚えておきたい主要コマンド</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <table>
+            <thead>
+              <tr>
+                <th>コマンド</th>
+                <th>用途</th>
+                <th>頻度</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>npm run dev</code></td>
+                <td>開発サーバーを起動</td>
+                <td>毎日</td>
+              </tr>
+              <tr>
+                <td><code>npm run build</code></td>
+                <td>本番ビルド（PR前にチェック）</td>
+                <td>PR前</td>
+              </tr>
+              <tr>
+                <td><code>npm run lint</code></td>
+                <td>ESLintで静的解析</td>
+                <td>都度</td>
+              </tr>
+              <tr>
+                <td><code>npm run format</code></td>
+                <td>Prettierで自動整形</td>
+                <td>都度</td>
+              </tr>
+              <tr>
+                <td><code>npm run test</code></td>
+                <td>Vitestユニットテスト</td>
+                <td>PR前</td>
+              </tr>
+              <tr>
+                <td><code>npx prisma migrate dev</code></td>
+                <td>DBスキーマを更新</td>
+                <td>schema変更時</td>
+              </tr>
+              <tr>
+                <td><code>npx prisma studio</code></td>
+                <td>DB GUIを開く</td>
+                <td>デバッグ時</td>
+              </tr>
+              <tr>
+                <td><code>cd e2e && npx playwright test</code></td>
+                <td>E2Eテスト実行</td>
+                <td>PR前</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="info-box tip">
+            <svg><use href="#icon-bulb" /></svg>
+            <div>
+              <strong>困ったら</strong> <code>package.json</code> の
+              <code>scripts</code>
+              セクションに定義されているコマンド一覧があります。READMEとあわせて確認しましょう。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 15: ブランチ運用 -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-orange">SECTION 3 — 1/4</span>
+            <h2>Gitブランチ運用</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <p>
+            本番ブランチは <code>main</code>。作業は必ず
+            <strong>feature branch</strong> を切ってからPRで取り込みます。
+          </p>
+          <div class="branch-flow">
+            <span class="branch-pill main">main</span>
+            <span class="arrow">→ checkout</span>
+            <span class="branch-pill feature">feature/login-form</span>
+            <span class="arrow">→ commit & push</span>
+            <span class="branch-pill pr">Pull Request</span>
+            <span class="arrow">→ merge</span>
+            <span class="branch-pill main">main</span>
+          </div>
+          <h3>ブランチ命名規則</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>プレフィックス</th>
+                <th>用途</th>
+                <th>例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>feature/</code></td>
+                <td>新機能追加</td>
+                <td><code>feature/user-profile</code></td>
+              </tr>
+              <tr>
+                <td><code>fix/</code></td>
+                <td>バグ修正</td>
+                <td><code>fix/login-redirect</code></td>
+              </tr>
+              <tr>
+                <td><code>chore/</code></td>
+                <td>雑務（依存更新、設定変更）</td>
+                <td><code>chore/update-deps</code></td>
+              </tr>
+              <tr>
+                <td><code>docs/</code></td>
+                <td>ドキュメントのみの変更</td>
+                <td><code>docs/readme-update</code></td>
+              </tr>
+              <tr>
+                <td><code>refactor/</code></td>
+                <td>リファクタ（挙動変えない）</td>
+                <td><code>refactor/extract-helper</code></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="code-block">
+            <div class="label">ブランチを切る</div>
+            git checkout main git pull git checkout
+            <span class="op">-b</span> feature/your-task-name
+          </div>
+        </div>
+      </div>
+
+      <!-- 16: Conventional Commits -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-orange">SECTION 3 — 2/4</span>
+            <h2>コミット規約 (Conventional Commits)</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <p>
+            コミットメッセージは
+            <code>&lt;type&gt;: &lt;summary&gt;</code> の形式で書きます。プロジェクトでは
+            <strong>commitlint</strong> がチェックします。
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>type</th>
+                <th>意味</th>
+                <th>例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>feat</code></td>
+                <td>新機能追加</td>
+                <td><code>feat: add user profile page</code></td>
+              </tr>
+              <tr>
+                <td><code>fix</code></td>
+                <td>バグ修正</td>
+                <td><code>fix: handle null session in middleware</code></td>
+              </tr>
+              <tr>
+                <td><code>docs</code></td>
+                <td>ドキュメント</td>
+                <td><code>docs: update README setup section</code></td>
+              </tr>
+              <tr>
+                <td><code>style</code></td>
+                <td>整形のみ（動作変更なし）</td>
+                <td><code>style: format with prettier</code></td>
+              </tr>
+              <tr>
+                <td><code>refactor</code></td>
+                <td>リファクタ</td>
+                <td><code>refactor: extract auth helper</code></td>
+              </tr>
+              <tr>
+                <td><code>test</code></td>
+                <td>テスト追加・修正</td>
+                <td><code>test: add login flow e2e test</code></td>
+              </tr>
+              <tr>
+                <td><code>chore</code></td>
+                <td>その他雑務</td>
+                <td><code>chore: bump next to 16.2.2</code></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="info-box warn">
+            <svg><use href="#icon-warn" /></svg>
+            <div>
+              <strong>commitlintで弾かれます</strong>commitフック (husky)
+              によりフォーマットを満たさないと
+              <code>git commit</code>
+              が失敗します。慣れるまでは少しめんどうですが、確実にチームの履歴がきれいになります。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 17: PRの出し方 -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-orange">SECTION 3 — 3/4</span>
+            <h2>Pull Request の出し方</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <ul class="step-list">
+            <li>
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <h4>ローカルで検証</h4>
+                <p>
+                  <code>npm run lint && npm run format:check && npm run test && npm run build</code>
+                  をすべて通す
+                </p>
+              </div>
+            </li>
+            <li>
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <h4>プッシュ</h4>
+                <p><code>git push origin feature/your-task-name</code></p>
+              </div>
+            </li>
+            <li>
+              <div class="step-num">3</div>
+              <div class="step-content">
+                <h4>GitHubでPR作成</h4>
+                <p>テンプレートに沿って「何を・なぜ・どう確認したか」を記載</p>
+              </div>
+            </li>
+            <li>
+              <div class="step-num">4</div>
+              <div class="step-content">
+                <h4>CIの通過を待つ</h4>
+                <p>
+                  GitHub Actions（lint / test / e2e / security）がすべてグリーンになることを確認
+                </p>
+              </div>
+            </li>
+            <li>
+              <div class="step-num">5</div>
+              <div class="step-content">
+                <h4>レビューを受ける</h4>
+                <p>CODEOWNERSが自動アサインされます。指摘には早めに返信</p>
+              </div>
+            </li>
+            <li>
+              <div class="step-num">6</div>
+              <div class="step-content">
+                <h4>マージ</h4>
+                <p>Approve後、Squash and merge を基本とする</p>
+              </div>
+            </li>
+          </ul>
+          <div class="info-box tip">
+            <svg><use href="#icon-bulb" /></svg>
+            <div>
+              <strong>Draft PR を活用</strong>作業途中で相談したいときは「Draft
+              PR」で出すと、レビュー対象になる前にフィードバックがもらえます。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 18: 練習問題 -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-orange">SECTION 3 — 4/4</span>
+            <h2>練習: 規約に沿っているのはどれ？</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <div class="practice-header">
+            <svg><use href="#icon-pencil" /></svg>
+            <h3>次のコミットメッセージで、規約OKなものを選んでください</h3>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <h4>A.</h4>
+              <div class="code-block">Updated login form</div>
+              <div class="result-box">
+                <h4>答え</h4>
+                <p>
+                  <strong>NG</strong> — typeが無く動詞の過去形。<code
+                    >feat: add login form validation</code
+                  >
+                  のように書く。
+                </p>
+              </div>
+            </div>
+            <div class="card">
+              <h4>B.</h4>
+              <div class="code-block">feat: add password reset email flow</div>
+              <div class="result-box">
+                <h4>答え</h4>
+                <p>
+                  <strong>OK</strong> — typeが正しく、変更内容が一目で分かる短い要約になっている。
+                </p>
+              </div>
+            </div>
+            <div class="card">
+              <h4>C.</h4>
+              <div class="code-block">fix:バグ修正</div>
+              <div class="result-box">
+                <h4>答え</h4>
+                <p>
+                  <strong>NG</strong> —
+                  typeとsummaryの間に半角スペースが必要。要約が抽象すぎる。<code
+                    >fix: handle 401 on session refresh</code
+                  >
+                  など具体に。
+                </p>
+              </div>
+            </div>
+            <div class="card">
+              <h4>D.</h4>
+              <div class="code-block">chore: bump prisma to 7.7.0</div>
+              <div class="result-box">
+                <h4>答え</h4>
+                <p>
+                  <strong>OK</strong> — 依存関係更新は
+                  <code>chore</code> でOK。バージョンが具体的なのも良い。
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 19: コーディング規約 -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-blue">SECTION 4 — 1/4</span>
+            <h2>コーディング規約のキホン</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-check" /></svg>命名規則
+              </div>
+              <ul class="check-list">
+                <li>
+                  <svg><use href="#icon-check" /></svg
+                  ><span
+                    >関数・変数は <strong>camelCase</strong>（例: <code>getUserById</code>）</span
+                  >
+                </li>
+                <li>
+                  <svg><use href="#icon-check" /></svg
+                  ><span
+                    >コンポーネント・クラスは <strong>PascalCase</strong>（例:
+                    <code>UserProfileCard</code>）</span
+                  >
+                </li>
+                <li>
+                  <svg><use href="#icon-check" /></svg
+                  ><span
+                    >定数は <strong>UPPER_SNAKE_CASE</strong>（例: <code>MAX_RETRY</code>）</span
+                  >
+                </li>
+                <li>
+                  <svg><use href="#icon-check" /></svg
+                  ><span
+                    >ファイル名は<strong>kebab-case</strong>または<strong>PascalCase</strong>でコンポーネントと合わせる</span
+                  >
+                </li>
+              </ul>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-shield" /></svg>型・モジュール規約
+              </div>
+              <ul class="check-list">
+                <li>
+                  <svg><use href="#icon-check" /></svg
+                  ><span
+                    ><code>any</code> 型は<strong>禁止</strong>。どうしても必要なら
+                    <code>unknown</code> + 型ガード</span
+                  >
+                </li>
+                <li>
+                  <svg><use href="#icon-check" /></svg
+                  ><span
+                    ><code>"use client"</code> は<strong>必要最小限</strong>。Server
+                    Componentがデフォルト</span
+                  >
+                </li>
+                <li>
+                  <svg><use href="#icon-check" /></svg
+                  ><span>Zodで入力スキーマを定義し、型を <code>z.infer</code> で導出</span>
+                </li>
+                <li>
+                  <svg><use href="#icon-check" /></svg
+                  ><span
+                    >UI状態は <code>zustand</code> を使う（グローバルにReact
+                    Contextは使わない）</span
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="info-box note">
+            <svg><use href="#icon-info" /></svg>
+            <div>
+              <strong>規約の正本</strong>このスライドは概要です。詳細は <code>AGENTS.md</code> と
+              <code>.claude/rules/</code> 配下のドキュメントを必ず確認してください。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 20: ディレクトリ構造 -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-blue">SECTION 4 — 2/4</span>
+            <h2>どこに何を置く？ — ディレクトリ構造</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <div class="code-block">
+            <div class="label">プロジェクトルート</div>
+            GrowthMile/ ├── <span class="tb">src/</span> │ ├── <span class="tb">app/</span>
+            <span class="cm"># App Router: pages, layouts, API routes</span> │ ├──
+            <span class="tb">components/</span> <span class="cm"># 共有Reactコンポーネント</span> │
+            ├── <span class="tb">features/</span>
+            <span class="cm"># 機能別モジュール (UI + ロジック)</span> │ └──
+            <span class="tb">lib/</span>
+            <span class="cm"># Prisma, NextAuth, 共通ユーティリティ</span> ├──
+            <span class="tb">prisma/</span>
+            <span class="cm"># schema.prisma, マイグレーション</span> ├──
+            <span class="tb">public/</span> <span class="cm"># 静的ファイル</span> ├──
+            <span class="tb">e2e/</span> <span class="cm"># Playwright (workspace外)</span> ├──
+            <span class="tb">docs/</span> <span class="cm"># 要件定義・設計書</span> ├──
+            <span class="tb">scripts/</span> <span class="cm"># ユーティリティスクリプト</span> └──
+            <span class="tb">.github/</span>
+            <span class="cm"># Actions, PRテンプレ, CODEOWNERS</span>
+          </div>
+          <div class="info-box tip">
+            <svg><use href="#icon-bulb" /></svg>
+            <div>
+              <strong>迷ったら features/ か components/</strong> 単一機能でしか使わない部品 →
+              <code>features/&lt;feature&gt;/</code>。複数機能で再利用する部品 →
+              <code>components/</code>。境界に迷ったらレビューで相談。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 21: Lint / Format / Test -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-blue">SECTION 4 — 3/4</span>
+            <h2>Lint / Format / Test の回し方</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <p>
+            PRを出す前に、ローカルでひととおり通すことが最低ライン。CIで弾かれるとレビュアの時間を奪います。
+          </p>
+          <div class="code-block">
+            <div class="label">PR前のセルフチェック（コピペ用）</div>
+            <span class="cm"># 1. フォーマット</span>
+            npm run format
+
+            <span class="cm"># 2. Lint</span>
+            npm run lint
+
+            <span class="cm"># 3. ユニットテスト</span>
+            npm run test
+
+            <span class="cm"># 4. ビルドが通るか</span>
+            npm run build
+
+            <span class="cm"># 5. E2E（変更が大きい時）</span>
+            <span class="kw">cd</span> e2e <span class="op">&&</span> npx playwright test
+          </div>
+          <div class="info-box note">
+            <svg><use href="#icon-info" /></svg>
+            <div>
+              <strong>husky + lint-staged</strong
+              >コミット時に変更ファイルだけPrettier/ESLintが自動実行されます。コミットが失敗した場合は、メッセージを読んで修正してから再コミットしてください。
+            </div>
+          </div>
+          <div class="info-box warn">
+            <svg><use href="#icon-warn" /></svg>
+            <div>
+              <strong>テストの passWithNoTests</strong>新規機能を追加した際は、ユニットテスト or
+              E2Eを最低1本書く方針。「テストゼロでも通る」設定はあくまで暫定です。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 22: トラブルシューティングFAQ -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-blue">SECTION 4 — 4/4</span>
+            <h2>トラブルシューティング FAQ</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-warn" /></svg>npm install が失敗する
+              </div>
+              <p class="muted">
+                Node.jsのバージョンを確認 (<code>node -v</code>)。20.x でなければ
+                <code>nvm use 20</code>。それでもダメなら
+                <code>rm -rf node_modules package-lock.json && npm install</code>。
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-warn" /></svg>docker compose up に失敗する
+              </div>
+              <p class="muted">
+                Docker Desktopが起動しているか確認。ポート5432が他のPostgreSQLで使われていないか
+                <code>lsof -i :5432</code>（Mac）/
+                <code>netstat -ano | findstr 5432</code>（Win）で確認。
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-warn" /></svg>prisma migrate でエラー
+              </div>
+              <p class="muted">
+                <code>.env</code> の <code>DATABASE_URL</code> が正しいか、DBコンテナが
+                <code>healthy</code> か確認。スキーマ衝突の場合は
+                <code>npx prisma migrate reset</code>（ローカル限定）。
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-warn" /></svg>git commit が husky で弾かれる
+              </div>
+              <p class="muted">
+                エラーログをよく読む。Conventional Commits
+                形式を満たしていない、もしくはESLint/Prettierがエラーを出している。<code
+                  >npm run format && npm run lint</code
+                >
+                で自動修正してから再コミット。
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-warn" /></svg>ssh -T git@github.com で permission denied
+              </div>
+              <p class="muted">
+                公開鍵がGitHubに登録されていない可能性大。GitHub Settings → SSH keys
+                を確認。鍵のファイル名がデフォルト (<code>id_ed25519</code>) でない場合は
+                <code>~/.ssh/config</code> での設定が必要。
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <svg><use href="#icon-warn" /></svg>解決しないとき
+              </div>
+              <p class="muted">
+                ためらわず Slack の
+                <code>#dev-help</code>
+                等で質問を。「何をしたら」「何が起きたか」「どう試したか」をセットで書くと解決が早いです。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 23: まとめ -->
+      <div class="slide">
+        <div class="slide-header">
+          <div class="slide-header-left">
+            <span class="badge badge-green">WRAP UP</span>
+            <h2>今日のチェックリスト</h2>
+          </div>
+        </div>
+        <div class="slide-content">
+          <div class="grid-2">
+            <ul class="check-list">
+              <li>
+                <svg><use href="#icon-check" /></svg
+                ><span>Git / Node.js 20.x / Docker Desktop / VS Code を導入した</span>
+              </li>
+              <li>
+                <svg><use href="#icon-check" /></svg
+                ><span>SSH鍵を作りGitHubに登録、<code>ssh -T</code> が通った</span>
+              </li>
+              <li>
+                <svg><use href="#icon-check" /></svg
+                ><span>リポジトリをクローンし、ルート＋e2eで <code>npm install</code> 済み</span>
+              </li>
+              <li>
+                <svg><use href="#icon-check" /></svg
+                ><span><code>.env</code> を作成し必要な値を埋めた</span>
+              </li>
+            </ul>
+            <ul class="check-list">
+              <li>
+                <svg><use href="#icon-check" /></svg
+                ><span
+                  ><code>docker compose up -d db</code> でDBを起動し、Prisma migrate を実行</span
+                >
+              </li>
+              <li>
+                <svg><use href="#icon-check" /></svg
+                ><span><code>npm run dev</code> で localhost:3000 が表示された</span>
+              </li>
+              <li>
+                <svg><use href="#icon-check" /></svg
+                ><span>ブランチ命名・Conventional Commits の概要を理解した</span>
+              </li>
+              <li>
+                <svg><use href="#icon-check" /></svg><span>PR前のセルフチェック手順を覚えた</span>
+              </li>
+            </ul>
+          </div>
+          <h3>次の一歩</h3>
+          <ul class="check-list">
+            <li>
+              <svg><use href="#icon-target" /></svg
+              ><span
+                >「練習用Issue」または「good first
+                issue」ラベルのタスクを1つ選び、ブランチを切る</span
+              >
+            </li>
+            <li>
+              <svg><use href="#icon-target" /></svg
+              ><span
+                ><code>AGENTS.md</code> /
+                <code>docs/</code> 配下を読み、プロジェクトのアーキテクチャ全体像をつかむ</span
+              >
+            </li>
+            <li>
+              <svg><use href="#icon-target" /></svg
+              ><span>はじめてのPRをDraftで出してフィードバックをもらう</span>
+            </li>
+          </ul>
+          <div class="info-box tip">
+            <svg><use href="#icon-bulb" /></svg>
+            <div>
+              <strong>ようこそ GROWTH MILE へ</strong
+              >分からないことは遠慮なく聞いてください。質問はチームの財産です。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)" disabled>← 前へ</button>
+      <div class="nav-center">
+        <span class="slide-counter" id="slideCounter">1 / 23</span>
+        <div class="dot-nav" id="dotNav"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px">
+        <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">
+          <svg id="themeIcon"><use href="#icon-sun" /></svg>
+          <span id="themeLabel">Light</span>
+        </button>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">次へ →</button>
+      </div>
+    </div>
+
+    <script>
+      const slides = Array.from(document.querySelectorAll(".slide"))
+      const total = slides.length
+      let current = 0
+
+      const counter = document.getElementById("slideCounter")
+      const prevBtn = document.getElementById("prevBtn")
+      const nextBtn = document.getElementById("nextBtn")
+      const progress = document.getElementById("progressBar")
+      const dotNav = document.getElementById("dotNav")
+
+      // dot nav
+      slides.forEach((_, i) => {
+        const dot = document.createElement("div")
+        dot.className = "dot" + (i === 0 ? " active" : "")
+        dot.addEventListener("click", () => goTo(i))
+        dotNav.appendChild(dot)
+      })
+      const dots = Array.from(dotNav.children)
+
+      function goTo(n) {
+        if (n < 0 || n >= total) return
+        slides[current].classList.remove("active")
+        dots[current].classList.remove("active")
+        current = n
+        slides[current].classList.add("active")
+        dots[current].classList.add("active")
+        counter.textContent = current + 1 + " / " + total
+        prevBtn.disabled = current === 0
+        nextBtn.disabled = current === total - 1
+        progress.style.width = ((current + 1) / total) * 100 + "%"
+      }
+      function changeSlide(dir) {
+        goTo(current + dir)
+      }
+
+      // 初期プログレス
+      progress.style.width = (1 / total) * 100 + "%"
+
+      document.addEventListener("keydown", (e) => {
+        if (
+          e.key === "ArrowRight" ||
+          e.key === "ArrowDown" ||
+          e.key === "PageDown" ||
+          e.key === " "
+        ) {
+          e.preventDefault()
+          changeSlide(1)
+        }
+        if (e.key === "ArrowLeft" || e.key === "ArrowUp" || e.key === "PageUp") {
+          e.preventDefault()
+          changeSlide(-1)
+        }
+        if (e.key === "Home") goTo(0)
+        if (e.key === "End") goTo(total - 1)
+      })
+
+      // テーマ切替
+      let isDark = true // ダーク既定
+      const themeIcon = document.getElementById("themeIcon")
+      const themeLabel = document.getElementById("themeLabel")
+      function applyTheme() {
+        document.body.setAttribute("data-theme", isDark ? "dark" : "light")
+        themeIcon.innerHTML = '<use href="#' + (isDark ? "icon-sun" : "icon-moon") + '"/>'
+        themeLabel.textContent = isDark ? "Light" : "Dark"
+      }
+      function toggleTheme() {
+        isDark = !isDark
+        applyTheme()
+      }
+      applyTheme()
+
+      // 答えトグル (result-box 内の「答え」見出しをボタン化)
+      document.querySelectorAll(".result-box").forEach((box) => {
+        const h4 = box.querySelector("h4")
+        if (!h4 || h4.textContent.trim() !== "答え") return
+        // h4 以降の要素を answer-body にまとめる
+        const wrapper = document.createElement("div")
+        wrapper.className = "answer-body"
+        let sib = h4.nextElementSibling
+        while (sib) {
+          const next = sib.nextElementSibling
+          wrapper.appendChild(sib)
+          sib = next
+        }
+        // h4 を トグルボタンに置換
+        const btn = document.createElement("button")
+        btn.className = "answer-toggle-btn"
+        btn.innerHTML = '<svg class="at-chevron"><use href="#icon-chevron"/></svg> 答えを見る'
+        btn.addEventListener("click", () => {
+          const open = wrapper.classList.toggle("open")
+          btn.classList.toggle("open", open)
+          btn.innerHTML =
+            '<svg class="at-chevron"><use href="#icon-chevron"/></svg> ' +
+            (open ? "答えを隠す" : "答えを見る")
+        })
+        h4.replaceWith(btn)
+        box.appendChild(wrapper)
+      })
+    </script>
+  </body>
+</html>

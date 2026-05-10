@@ -6,7 +6,7 @@
 | -------------- | -------------------------------------------------- |
 | **日付**       | {YYYY-MM-DD}                                       |
 | **ステータス** | Proposed                                           |
-| **担当**       | {Cursor / 人間}                                    |
+| **担当**       | {Claude Code / 人間}                               |
 | **関連設計書** | [`docs/features/{file}.md`](../features/{file}.md) |
 
 > ステータス: `Proposed` → `Accepted` → `Deprecated` / `Superseded by ADR-NNN`

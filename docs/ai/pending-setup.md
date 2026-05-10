@@ -93,7 +93,7 @@ services:
 
 ## 5. リポジトリ衛生（要ターミナル実行）
 
-Cursor では実施しない、ローカルでのクリーンアップ作業です。Claude Code か手元で実行してください。
+Claude Code またはローカルで実行するクリーンアップ作業です。
 
 ### 5.1 `tmpapp/` ディレクトリの削除
 
@@ -131,6 +131,19 @@ e2e/playwright-report/
 ### 5.4 README 既存文との整合確認
 
 `README.md` を `src/app` 構成・日本語版へ刷新済み。`app/page.tsx` 等の旧パス記述が残っていないか CI で検出する場合は別途 lint 設定を追加してください。
+
+### 5.5 `.claude/` 配下のスキル確認（[完了済み]）
+
+`.claude/skills/implement-feature/SKILL.md` および `.claude/rules/` 配下のルールは GROWTH MILE / Next.js コンテキストに更新済み。
+`.claude/skills/incident-response/SKILL.md` の例外ハンドリング例（Java の `PreZenException` を TypeScript 例に置換）については以下を参照：
+
+```typescript
+// NG: ログのみで上位に伝播しない
+} catch (e) { console.error(e.message) }
+
+// OK: カスタム例外でラップして再スロー
+} catch (e) { throw new GrowthMileError("処理に失敗しました", { cause: e }) }
+```
 
 ---
 

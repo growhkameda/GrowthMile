@@ -80,6 +80,7 @@ exit_code: {終了コード}
 
 - [ ] 修正して再ビルド → `implement-and-verify.md` Step 2 に戻る
 - [ ] 根本原因が不明なため `incident-response` スキルを起動してエスカレーション
+
 ```
 
 ---
@@ -145,6 +146,7 @@ exit_code: 1
 
 - [ ] 実装を修正して再テスト → `implement-and-verify.md` Step 2 に戻る
 - [ ] テスト自体が誤っている場合は人間に確認を求める（`NEEDS_HUMAN_REVIEW`）
+
 ```
 
 ---
@@ -173,7 +175,7 @@ failed_stage: "lint | validate | security | quality | e2e"
 | ステージ | ジョブ名 | ステータス | 失敗原因 |
 | -------- | -------- | ---------- | -------- |
 | lint | `check_ai_laziness` | FAILED | 禁止ワード検出 |
-| quality | `backend_test` | PASSED | - |
+| quality | `unit-test` | PASSED | - |
 
 ### エラーログ抜粋
 
@@ -201,6 +203,7 @@ failed_stage: "lint | validate | security | quality | e2e"
 
 - [ ] 修正してPush → CI再実行
 - [ ] セキュリティ関連の失敗の場合は人間にエスカレーション（`NEEDS_HUMAN_REVIEW`）
+
 ```
 
 ---

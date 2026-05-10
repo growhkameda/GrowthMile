@@ -5,7 +5,7 @@ globs: "docs/features/**/*.md,docs/design/**/*.md,docs/api/**/*.md"
 
 # 設計ワークフロー ルール
 
-このルールは `docs/features/`, `docs/design/`, `docs/api/` 配下の設計書を扱う際に、Cursor が従うべき手順を定義します。
+このルールは `docs/features/`, `docs/design/`, `docs/api/` 配下の設計書を扱う際に、Claude Code が従うべき手順を定義します。
 
 ## 1. 破壊的変更への対応
 
@@ -31,15 +31,15 @@ globs: "docs/features/**/*.md,docs/design/**/*.md,docs/api/**/*.md"
 - `docs/agentic/mvp_requirements.md` ↔ `docs/features/requirements.md` の矛盾がないか
 - `docs/api/spec-api.md` が変更後の機能を反映しているか
 - `docs/design/spec-db.md` が変更後のデータ要件を満たしているか
-- 変更の影響範囲を Claude Code への指示内容に明記する
+- 変更の影響範囲を実装への指示内容に明記する
 
-## 3. Composerワークフローの使用
+## 3. ワークフローの使用
 
 開発サイクルの各フェーズを実行する際は、以下のワークフローを参照すること：
 
-- `requirement-review-loop.md` — 要件定義→レビュー→修正ループ（MADC）
-- `implement-and-verify.md` — 実装→ビルド→テスト検証ループ
-- `full-dev-cycle.md` — フルサイクル（全フェーズ・品質ゲート一覧）
+- `.claude/workflows/requirement-review-loop.md` — 要件定義→レビュー→修正ループ（Multi-Agent Debate）
+- `.claude/workflows/implement-and-verify.md` — 実装→ビルド→テスト検証ループ
+- `.claude/workflows/full-dev-cycle.md` — フルサイクル（全フェーズ・品質ゲート一覧）
 
 ## 4. ADR生成チェック
 

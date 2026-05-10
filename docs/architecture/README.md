@@ -1,14 +1,12 @@
 # アーキテクチャ (Architecture)
 
-このディレクトリは PreZen プロジェクトにおける **システム全体のアーキテクチャ設計・構造・重要な意思決定** を管理します。
+このディレクトリは GROWTH MILE プロジェクトにおける **システム全体のアーキテクチャ設計・構造・重要な意思決定** を管理します。
 
 ## ディレクトリ構成
 
 - `./decisions/`: **ADR (Architecture Decision Records)** - 技術選定や設計の意思決定ログ
-- `architecture.md` / `architecture.drawio`: システム全体の構成図
-- `backend_structure.md`: バックエンド（Spring Boot）の設計方針と層構造
-- `frontend_structure.md`: フロントエンド（React）の設計方針とディレクトリ構成
-- `spec-infrastructure.md`: インフラストラクチャ設計
+- `architecture.md`: システム全体の構成図
+- `spec-infrastructure.md`: インフラストラクチャ設計（環境構成・CI/CD・本番想定）
 
 ## 目的
 

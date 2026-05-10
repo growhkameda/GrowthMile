@@ -1,12 +1,12 @@
-﻿---
+---
 description: >
-  ユーザーから「指定された機能を実装して」「設計書をもとに実装を進めて」など、機能実装タスクを要求された際に使用するスキル。フロントエンドおよびバックエンドのレイヤードアーキテクチャに従い、実装から自己検証までを行う。
+  ユーザーから「指定された機能を実装して」「設計書をもとに実装を進めて」など、機能実装タスクを要求された際に使用するスキル。Next.js App Routerアーキテクチャに従い、実装から自己検証までを行う。
 ---
 
 # 機能実装スキル
 
 <instructions>
-あなたは PreZen プロジェクトの実装担当エンジニア・エージェントです。
+あなたは GrowthMile プロジェクトの実装担当エンジニア・エージェントです。
 ユーザー指示または仕様書に記載されたタスクを、プロジェクトの厳密なコーディングルールに則って実装してください。
 </instructions>
 
@@ -26,71 +26,95 @@ description: >
 
 **詳細ルールファイル（存在する場合は優先参照）:**
 
-- `.cursor/rules/*.mdc` — コーディング規約やエラーハンドリングなど、プロジェクトのすべての詳細ルール
+- `.claude/rules/*.md` — コーディング規約・UIルール・CI/CDルールなど
 
 **モデル選定ガイド（AGENTS.md セクション6参照）:**
 
 - **通常の機能実装**: 現行モデル（`claude-sonnet-4-6`）を継続使用
-- **大規模リファクタリング・既存コードベースの大規模改修**: `claude-opus-4-6` へのエスカレーションを検討する（複雑な依存解析・高リスクな変更が伴う場合）
-  </step>
+- **大規模リファクタリング・既存コードベースの大規模改修**: `claude-opus-4-6` へのエスカレーションを検討する
+</step>
 
-### Step 2: 実装 (フロントエンド / バックエンド)
+### Step 2: 実装（Next.js App Router）
 
 <step>
 指定された仕様に基づいてコードを記述します。ルールを必ず守ってください。
 
-**フロントエンド（React + TypeScript + TailwindCSS 4）**:
+**ページ・レイアウト（App Router）:**
 
-- `frontend/src/features/<機能名>/` 配下にコンポーネント・ストア・サービスを配置
-- 共通コンポーネントは `frontend/src/components/`
-- 型定義を必ず作成（`any` 禁止）
+- `src/app/<路由>/page.tsx` にページコンポーネントを配置
+- `src/app/<路由>/layout.tsx` にレイアウトを配置
+- Server Components をデフォルトとし、`"use client"` は必要最小限
 
-**バックエンド（Java 21 + Spring Boot 3）**:
+**API Routes:**
 
-- `Controller` → `Service` → `Repository` → `Entity` のレイヤー構成を厳守
-- パッケージ: `com.prezen.{ controller, service, repository, ... }`
-- SQLは必ずパラメータバインド（Repositoryの実装）を使用
+- `src/app/api/<リソース名>/route.ts` として実装
+- 全入力を Zod でバリデーション
+- `NextResponse.json<ApiResponse<T>>()` で型付きレスポンスを返す
+
+**コンポーネント:**
+
+- 共有コンポーネント: `src/components/`
+- 機能別コンポーネント: `src/features/<機能名>/`
+
+**DB アクセス:**
+
+- `src/lib/db.ts` 経由で Prisma クライアントを使用（シングルトン）
+- Prisma 生成型を使用し、`any` 禁止
+
+**その他のルール:**
+
 - カスタムエラークラスを使用
-  </step>
+- 環境変数は `src/env.ts` の Zod スキーマ経由でアクセス
+- 楽観的 UI 更新は `useOptimistic` を使用
+</step>
 
 ### Step 3: 自己検証
 
 <step>
-実装コードの記述が終わったら、Docker環境でビルドとテストを実行し、自分自身のコードが動くことを確認します。
-実行時は必ずTTY無効オプション(`-T`)を使用し、CRLF問題を回避してください。
+実装コードの記述が終わったら、以下を順番に実行し、自分自身のコードが動くことを確認します。
+
 ```bash
-# フロントエンド
-docker-compose exec -T frontend npm run build
-docker-compose exec -T frontend npm run lint
-
-# バックエンド
-
-docker-compose exec -T backend sh -c "sed -i 's/\r$//' ./gradlew && chmod +x ./gradlew && ./gradlew clean build"
-docker-compose exec -T backend sh -c "./gradlew test"
-
+npm run lint
+npm run format:check
+npm run build
+npm run test
 ```
+
 エラーが出た場合はエラーログを自己参照し、コードを修正するサイクルを回します。
+全てパスするまでこのステップを繰り返します。
 </step>
 
 ### Step 4: ドキュメントの同期更新
+
 <step>
 実装した内容（APIのペイロード変更や新規エンドポイント、DB変更等）によって仕様が変わった・詳細化された場合は、以下のドキュメントを忘れずに更新してください。
+
 - `docs/api/spec-api.md`
 - `docs/design/spec-db.md`
+
+Markdownを更新した場合は Lint を実行してCIエラーを防ぐこと：
+
+```bash
+npx markdownlint-cli "docs/**/*.md" --fix
+```
+
 </step>
 
 ### Step 5: コードレビュー（code-reviewer SubAgent 自動実行）
+
 <step>
 自己検証が全てパスしたら、`code-reviewer` サブエージェントを呼び出してコードレビューを実施します。
 このステップは自動的に実行されます（ユーザーの指示を待たない）。
 
 **レビュー結果の判定に応じて分岐:**
+
 - **PASS / PASS_WITH_NOTES**: Step 6（完了報告）へ進む
 - **FAIL**: 指摘事項を修正し、Step 3（自己検証）からやり直す
 - **NEEDS_HUMAN_REVIEW**: 破壊的変更をユーザーに報告し、判断を仰ぐ
 </step>
 
 ### Step 6: ユーザーへの完了報告
+
 <step>
 実装した内容のサマリー、自己検証で実行したテストの結果、コードレビューの結果、および更新したドキュメントの一覧をターミナルでユーザーに報告します。
 コミットするかどうかはユーザーの判断を仰ぎます。
@@ -100,8 +124,7 @@ docker-compose exec -T backend sh -c "./gradlew test"
 
 <restrictions>
 - ユーザーに共有せず、既存の外部連携インターフェースやデータベーススキーマの**破壊的変更**を行わないこと。
-- 新しいパッケージや依存関係（npm / gradle）を勝手に追加しないこと（必要な場合は提案する）。
+- 新しいパッケージや依存関係（npm）を勝手に追加しないこと（必要な場合は提案する）。
 - `.claude/settings.json` に設定されたdenyコマンドを決して使用しないこと。
 - セキュリティルール（秘密情報のハードコード禁止）を徹底すること。
 </restrictions>
-```

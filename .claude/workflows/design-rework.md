@@ -26,7 +26,7 @@ docs/evidence/ai-reviews/20260307-ticket-management-ai-review.md
 
 ## テンプレート 1: Agent B 設計指摘書
 
-`debate-design.mdc` のディベートプロセスにおいて Agent B が指摘を出す際に使用するフォーマット。
+`requirement-review-loop.md` のディベートプロセスにおいて Agent B が指摘を出す際に使用するフォーマット。
 このフォーマットで出力した後、`docs/evidence/design-reviews/YYYYMMDD-{機能名}-debate-v{N}.md` に保存すること。
 
 ```markdown
@@ -71,7 +71,7 @@ reviewer: "Agent B (QA/Security)"
 
 ## テンプレート 2: 人間レビュー差し戻し通知
 
-品質ゲート①（人間が設計書を最終承認）において差し戻しが発生した場合に、Cursorが人間の指示を受けて出力するフォーマット。
+品質ゲート①（人間が設計書を最終承認）において差し戻しが発生した場合に、Claude Code が人間の指示を受けて出力するフォーマット。
 このフォーマットで出力した後、`docs/evidence/design-reviews/YYYYMMDD-{機能名}-human-review.md` に保存すること。
 
 ```markdown
@@ -101,7 +101,7 @@ status: "REWORK_REQUIRED"
 2. 〇〇ユースケース（ログアウト済みユーザーのアクセス等）を追記すること
 3. 〇〇の非機能要件に具体的な数値（タイムアウト値、同時接続数等）を記載すること
 
-### Cursorへの指示
+### Claude Code への指示
 
 上記の修正依頼を `requirement-review-loop.md` の Step 2（ディベートループ）から再実行してください。
 修正完了後、再度 `docs/evidence/design-reviews/YYYYMMDD-{機能名}-debate-v{N+1}.md` を出力し、人間レビューに提出してください。
@@ -167,7 +167,7 @@ flowchart TD
     C -->|なし| E["Agent A: AIレビュー結果サマリーを出力\n(テンプレート3を使用)\n→ docs/evidence/ai-reviews/ に保存"]
     E --> F["人間: 設計書レビュー（品質ゲート①）"]
     F --> G{差し戻し？}
-    G -->|あり| H["Cursor: 差し戻し通知を出力\n(テンプレート2を使用)\n→ docs/evidence/design-reviews/ に保存"]
+    G -->|あり| H["Claude Code: 差し戻し通知を出力\n(テンプレート2を使用)\n→ docs/evidence/design-reviews/ に保存"]
     H --> A
     G -->|承認| I["Claude Code: 実装フェーズへ"]
 ```

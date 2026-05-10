@@ -26,7 +26,6 @@
       "Bash(markdownlint *)",
       "Bash(\"C:/Program Files/Git/bin/bash.exe\" scripts/*)",
       "Bash(bash scripts/*)",
-      "Bash(git commit --trailer \"Made-with: Cursor\":*)",
       "Bash(npm run diagrams*)"
     ],
     "deny": [

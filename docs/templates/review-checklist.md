@@ -1,6 +1,6 @@
 ﻿# レビューチェックリスト
 
-> **用途**: Cursor / Claude Code がレビュー時に使用する統一チェックリスト。
+> **用途**: Claude Code がレビュー時に使用する統一チェックリスト。
 > レビュー種別（要件定義 / コード / 設計書 / ビルド）に応じて該当セクションを使用してください。
 
 ---
@@ -17,7 +17,7 @@
 
 ### A-2. 具体性
 
-- [ ] 禁止ワードが含まれていない（`TODO`, `TBD`, `FIXME`, `後で記述`, `要検討`, `未定`, `PLACEHOLDER`, `WIP`, `DRAFT`）
+- [ ] 禁止ワードが含まれていない（`.claude/rules/docs.md` の品質基準を参照）
 - [ ] 曖昧表現がない（「〜など」「〜的な」「適切に」「必要に応じて」）
 - [ ] 数値基準が明記されている（件数制限、文字数制限、タイムアウト値、同時接続数）
 - [ ] ユーザーストーリーまたはユースケースが具体的
@@ -40,37 +40,39 @@
 
 ## B. コードレビュー
 
-### B-1. コーディング規約（`.cursor/rules/*.mdc` 準拠）
+### B-1. コーディング規約（`.claude/rules/project-tech-stack.md` 準拠）
 
-- [ ] 関数名: キャメルケース（TypeScript / Java）
+- [ ] 関数名: キャメルケース（TypeScript）
 - [ ] コンポーネント名: パスカルケース（React）
 - [ ] 定数: UPPER_SNAKE_CASE
-- [ ] TypeScript: `any` 型の使用なし、適切な型定義あり
+- [ ] TypeScript: `any` 型の使用なし、適切な型定義あり（Prisma 生成型を優先）
 - [ ] import文の整理（未使用importなし）
 
 ### B-2. アーキテクチャ準拠
 
-- [ ] フロントエンド: `features/<機能名>/` 配下に配置（components, stores, services）
-- [ ] バックエンド: `Controller → Service → Repository → Entity` レイヤー構成
-- [ ] パッケージ: `com.prezen.*` の規約に準拠
-- [ ] 共通コンポーネントは `frontend/src/components/` 配下
+- [ ] ページ・レイアウト: `src/app/` 配下に App Router 規約で配置
+- [ ] API Routes: `src/app/api/<リソース名>/route.ts` で実装
+- [ ] 機能別コンポーネント: `src/features/<機能名>/` 配下に配置
+- [ ] 共通コンポーネント: `src/components/` 配下
+- [ ] DB アクセス: `src/lib/db.ts` 経由（Prisma クライアントシングルトン）
+- [ ] `"use client"` は必要最小限（Server Components がデフォルト）
 
 ### B-3. セキュリティ（`docs/guides/security.md` 準拠）
 
 - [ ] 秘密鍵・APIキー・パスワード・トークンのハードコードなし
 - [ ] `.env` が `.gitignore` に含まれている
-- [ ] SQLインジェクション対策（Spring Data JPA パラメータバインド使用）
-- [ ] XSS対策（ユーザー入力のサニタイズ処理）
+- [ ] SQLインジェクション対策（Prisma クライアントを使用、生 SQL 禁止）
+- [ ] XSS対策（React のデフォルトエスケープ、`dangerouslySetInnerHTML` 不使用）
+- [ ] 全入力を Zod でバリデーション（API Routes / Server Actions）
 - [ ] ログに個人情報（メール、パスワード、トークン）を含まない
 - [ ] CORS設定が適切
 
-### B-4. エラーハンドリング（`.cursor/rules/*.mdc` 準拠）
+### B-4. エラーハンドリング（`.claude/rules/project-tech-stack.md` 準拠）
 
-- [ ] カスタムエラークラス使用
-- [ ] try-catch が適切に配置
+- [ ] カスタムエラークラス使用（生の `Error` を投げない）
+- [ ] try-catch が適切に配置（空 catch 禁止）
 - [ ] HTTPステータスコードが適切（200, 201, 400, 401, 403, 404, 500）
-- [ ] フロントエンドでエラーメッセージがユーザーに表示される
-- [ ] バックエンドでエラーレスポンスが統一フォーマット
+- [ ] API Routes は `NextResponse.json<ApiResponse<T>>()` で型付きレスポンス
 
 ### B-5. 破壊的変更の検出
 
@@ -90,7 +92,7 @@
 
 ## C. 設計書レビュー
 
-### C-1. フォーマット（`.cursor/rules/docs.mdc` 準拠）
+### C-1. フォーマット（`.claude/rules/docs.md` 準拠）
 
 - [ ] Markdown形式で記述
 - [ ] エンドポイント一覧・テーブル一覧は表形式
@@ -110,21 +112,22 @@
 
 ## D. ビルド＆テスト検証
 
-### D-1. フロントエンド
+### D-1. ビルド・型チェック
 
-- [ ] `npm run build` 成功（TypeScriptエラーなし）
+- [ ] `npm run build` 成功（TypeScript型エラーなし）
 - [ ] `npm run lint` 成功（ESLintエラーなし）
+- [ ] `npm run format:check` 成功（Prettierフォーマット準拠）
 - [ ] 警告の確認（新規警告が増えていないか）
 
-### D-2. バックエンド
+### D-2. テスト
 
-- [ ] `./gradlew clean build` 成功
-- [ ] `./gradlew test` 全テストパス
-- [ ] テストカバレッジの確認
+- [ ] `npm run test` 全テストパス（Vitest）
+- [ ] テストカバレッジの確認（カバレッジ設定がある場合）
+- [ ] E2E テスト: `cd e2e && npx playwright test` 成功（実装している場合）
 
 ### D-3. ドキュメント
 
-- [ ] `markdownlint` エラーなし
+- [ ] `npx markdownlint-cli "docs/**/*.md"` エラーなし
 
 ### D-4. エビデンス
 

@@ -118,7 +118,7 @@ GIT_COMMIT=$(cd "$PROJECT_ROOT" && git rev-parse --short HEAD 2>/dev/null || ech
 cat > "$EVIDENCE_DIR/summary.md" << EOF
 ---
 title: "テストエビデンス"
-project: "PreZen"
+project: "GROWTH MILE"
 date: "$TIMESTAMP"
 host: "$HOSTNAME_VAL"
 git_branch: "$GIT_BRANCH"

@@ -74,7 +74,7 @@ flowchart TB
 | `CI_DB_USER` | E2E 用 DB ユーザー |
 | `CI_DB_PASSWORD` | E2E 用 DB パスワード |
 | `CI_DB_NAME` | E2E 用 DB 名 |
-| `CI_NEXTAUTH_SECRET` | NextAuth 署名鍵（32 文字以上） |
+| `CI_NEXTAUTH_SECRET` | Auth.js `AUTH_SECRET` として渡される署名鍵（32 文字以上） |
 
 環境 URL は GitHub **Environments** の Environment URL、または Variables で管理することを推奨します。
 

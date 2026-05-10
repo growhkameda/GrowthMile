@@ -19,20 +19,20 @@ flowchart TD
 
             subgraph Phase1 ["Phase 1: 要件定義〜基本設計"]
                 direction TB
-                A["1. ユーザー: 要件定義を提示"] --> B["2. Agent A (設計者): 設計書ドラフト作成"]
+                A["1. ユーザー: 要件定義を提示"] --> B["2. Claude Code (設計者): 設計書ドラフト作成"]
             end
 
             subgraph Phase2 ["Phase 2: Multi-Agent Debate"]
                 direction TB
-                C["3. Agent B (QA/Sec): 批判的レビュー"] --> D["4. Agent A: 指摘の自己修正（議論ループ）"]
+                C["3. Claude Code (QA/Sec): 批判的レビュー"] --> D["4. Claude Code: 指摘の自己修正（議論ループ）"]
                 D --> E{5. 議論・修正完了？}
                 E -->|未完了| C
-                E -->|完了| F["6. Cursor: 設計書の最終出力"]
+                E -->|完了| F["6. Claude Code: 設計書の最終出力"]
             end
 
             subgraph Phase3 ["Phase 3: 実装"]
                 direction TB
-                G["7. Cursor: 実装<br>features/配下"] --> H["8. Claude Code: ビルド&テスト検証"]
+                G["7. Claude Code: 実装<br>features/配下"] --> H["8. Claude Code: ビルド&テスト検証"]
                 H --> I["9. Claude Code: コードレビュー"]
                 I --> J{10. 判定}
                 J -->|PASS| K{11. 人間: コードレビュー}
@@ -78,8 +78,8 @@ flowchart TD
 
 ```text
 Phase 0: デザインモック    → /design-mock ワークフローを使用（新画面のみ）
-Phase 1: 要件整理          → Cursor が作成
-Phase 2: 設計書・ADR作成   → Cursor が作成
+Phase 1: 要件整理          → Claude Code が作成
+Phase 2: 設計書・ADR作成   → Claude Code が作成
 Phase 3: 人間レビュー      → 人間が承認（品質ゲート①）
 Phase 4: 実装              → Claude Code が実装
 Phase 5: ビルド＆テスト    → Claude Code が検証
@@ -97,7 +97,7 @@ Phase 11: Prod デプロイ    → 人間が手動トリガー（品質ゲート
 
 新規画面を実装する場合は、実装前に必ずデザインモックを作成・承認する。
 
-1. `/design-mock` ワークフロー（`.cursor/workflows/design-mock.md`）を実行
+1. `.claude/workflows/design-mock.md` ワークフローを実行
 2. `docs/design/mockups/{画面名}-dark.html` / `{画面名}-light.html` を作成
 3. `docs/design/spec-design-system.md` のカラートークンに準拠していることを確認
 4. 人間がブラウザで動作確認・デザイン承認
@@ -109,9 +109,9 @@ Phase 11: Prod デプロイ    → 人間が手動トリガー（品質ゲート
 
 ---
 
-### Phase 1-3: 要件定義→ディベート（`/requirement-review-loop` を使用）
+### Phase 1-3: 要件定義→ディベート（`.claude/workflows/requirement-review-loop.md` を使用）
 
-`.cursor/workflows/requirement-review-loop.md` のディベートワークフローを実行する。
+`.claude/workflows/requirement-review-loop.md` のディベートワークフローを実行する。
 
 **品質ゲート①**: 人間が要件定義を最終承認
 
@@ -124,9 +124,9 @@ Phase 11: Prod デプロイ    → 人間が手動トリガー（品質ゲート
 5. 新規 API → `docs/api/spec-api.md` を同時更新
 6. DB 変更 → `docs/design/spec-db.md` を同時更新
 
-### Phase 5-6: ビルド→テスト→レビュー（`/implement-and-verify` の Step 2-4 を使用）
+### Phase 5-6: ビルド→テスト→レビュー（`.claude/workflows/implement-and-verify.md` の Step 2-4 を使用）
 
-`.cursor/workflows/implement-and-verify.md` の Step 2〜4 を実行する。
+`.claude/workflows/implement-and-verify.md` の Step 2〜4 を実行する。
 
 ### Phase 7: 人間コードレビュー
 
@@ -185,20 +185,20 @@ deploy-production:
 
 ## 各フェーズの担当者マトリクス
 
-| Phase                     | 担当                 | 品質ゲート      |
-| ------------------------- | -------------------- | --------------- |
-| 0. デザインモック         | Cursor / 人間確認    | [OK] デザイン承認 |
-| 1. 要件整理               | Cursor               | -               |
-| 2. 設計書・ADR作成        | Cursor               | -               |
-| 3. 人間レビュー           | 人間                 | [OK] 品質ゲート①  |
-| 4. 実装                   | Claude Code          | -               |
-| 5. ビルド＆テスト         | Claude Code          | -               |
-| 6. コードレビュー         | Claude Code          | -               |
-| 7. 人間コードレビュー     | 人間                 | [OK] 品質ゲート②  |
-| 8. Git コミット           | Claude Code          | -               |
-| 9. CI 品質チェック        | CI                   | 自動判定        |
-| 10. ST デプロイ・動作確認 | 自動→人間            | [OK] 品質ゲート③  |
-| 11. Prod デプロイ         | 人間（手動トリガー） | [OK] 品質ゲート④  |
+| Phase                     | 担当                    | 品質ゲート        |
+| ------------------------- | ----------------------- | ----------------- |
+| 0. デザインモック         | Claude Code / 人間確認  | [OK] デザイン承認 |
+| 1. 要件整理               | Claude Code             | -                 |
+| 2. 設計書・ADR作成        | Claude Code             | -                 |
+| 3. 人間レビュー           | 人間                    | [OK] 品質ゲート①  |
+| 4. 実装                   | Claude Code             | -                 |
+| 5. ビルド＆テスト         | Claude Code             | -                 |
+| 6. コードレビュー         | Claude Code             | -                 |
+| 7. 人間コードレビュー     | 人間                    | [OK] 品質ゲート②  |
+| 8. Git コミット           | Claude Code             | -                 |
+| 9. CI 品質チェック        | CI                      | 自動判定          |
+| 10. ST デプロイ・動作確認 | 自動→人間               | [OK] 品質ゲート③  |
+| 11. Prod デプロイ         | 人間（手動トリガー）    | [OK] 品質ゲート④  |
 
 ## 注意事項
 

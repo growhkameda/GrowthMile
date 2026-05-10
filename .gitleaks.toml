@@ -1,4 +1,4 @@
-title = "Gitleaks config for PreZen — 受託開発向けセキュリティスキャン"
+title = "Gitleaks config for GROWTH MILE — 受託開発向けセキュリティスキャン"
 
 # ─── グローバル許可リスト ─────────────────────────
 [allowlist]

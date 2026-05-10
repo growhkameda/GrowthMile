@@ -35,14 +35,14 @@ James Ralph (2026)「Agentic Full-Stack Development」の Evidence Bundle 概念
 
 | 差し戻し種別 | 使用テンプレート | 保存先 | ファイル名規則 |
 | ------------ | --------------- | ------- | -------------- |
-| 設計・Agent B指摘 | `.cursor/workflows/design-rework.md` のテンプレート | `docs/evidence/design-reviews/` | `YYYYMMDD-{機能名}-debate-v{N}.md` |
-| 設計・人間差し戻し | `.cursor/workflows/design-rework.md` のテンプレート | `docs/evidence/design-reviews/` | `YYYYMMDD-{機能名}-human-review.md` |
-| 設計・AIレビューサマリー | `.cursor/workflows/design-rework.md` のテンプレート | `docs/evidence/ai-reviews/` | `YYYYMMDD-{機能名}-ai-review.md` |
-| ビルドエラー | `.cursor/workflows/build-fail-report.md` のテンプレート | `docs/evidence/build-test/` | `YYYYMMDD-HHmm-build-fail.md` |
-| テスト失敗 | `.cursor/workflows/build-fail-report.md` のテンプレート | `docs/evidence/build-test/` | `YYYYMMDD-HHmm-test-fail.md` |
-| CI失敗 | `.cursor/workflows/build-fail-report.md` のテンプレート | `docs/evidence/build-test/` | `YYYYMMDD-HHmm-ci-fail.md` |
-| コードレビュー指摘(Major) | `.cursor/workflows/build-fail-report.md` のテンプレート | `docs/evidence/ai-reviews/` | `YYYYMMDD-HHmm-code-review.md` |
-| ST差し戻し | `.cursor/workflows/build-fail-report.md` のテンプレート | `docs/evidence/build-test/` | `YYYYMMDD-HHmm-st-rework.md` |
+| 設計・Agent B指摘 | `.claude/workflows/design-rework.md` のテンプレート | `docs/evidence/design-reviews/` | `YYYYMMDD-{機能名}-debate-v{N}.md` |
+| 設計・人間差し戻し | `.claude/workflows/design-rework.md` のテンプレート | `docs/evidence/design-reviews/` | `YYYYMMDD-{機能名}-human-review.md` |
+| 設計・AIレビューサマリー | `.claude/workflows/design-rework.md` のテンプレート | `docs/evidence/ai-reviews/` | `YYYYMMDD-{機能名}-ai-review.md` |
+| ビルドエラー | `.claude/workflows/build-fail-report.md` のテンプレート | `docs/evidence/build-test/` | `YYYYMMDD-HHmm-build-fail.md` |
+| テスト失敗 | `.claude/workflows/build-fail-report.md` のテンプレート | `docs/evidence/build-test/` | `YYYYMMDD-HHmm-test-fail.md` |
+| CI失敗 | `.claude/workflows/build-fail-report.md` のテンプレート | `docs/evidence/build-test/` | `YYYYMMDD-HHmm-ci-fail.md` |
+| コードレビュー指摘(Major) | `.claude/workflows/build-fail-report.md` のテンプレート | `docs/evidence/ai-reviews/` | `YYYYMMDD-HHmm-code-review.md` |
+| ST差し戻し | `.claude/workflows/build-fail-report.md` のテンプレート | `docs/evidence/build-test/` | `YYYYMMDD-HHmm-st-rework.md` |
 
 ### Step 2: Evidence Bundleを収集する
 
@@ -73,7 +73,7 @@ DATE=$(date +%Y%m%d-%H%M)
 # docs/evidence/build-test/${DATE}-test-fail.md にテンプレートの内容を記入して保存
 ```
 
-3. ファイル保存後、ユーザーに以下を報告する:
+1. ファイル保存後、ユーザーに以下を報告する:
 
 ```text
 ## 差し戻し報告完了
@@ -106,7 +106,7 @@ DATE=$(date +%Y%m%d-%H%M)
 
 ## 関連ワークフロー
 
-- 設計フェーズ差し戻し: `.cursor/workflows/design-rework.md`
-- 実装・テスト差し戻し: `.cursor/workflows/build-fail-report.md`
-- 実装・検証ループ: `.cursor/workflows/implement-and-verify.md`
+- 設計フェーズ差し戻し: `.claude/workflows/design-rework.md`
+- 実装・テスト差し戻し: `.claude/workflows/build-fail-report.md`
+- 実装・検証ループ: `.claude/workflows/implement-and-verify.md`
 - インシデント対応: `.claude/skills/incident-response/SKILL.md`

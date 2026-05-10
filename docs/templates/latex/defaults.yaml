@@ -1,5 +1,5 @@
 ---
-# pandoc defaults for PreZen document generation
+# pandoc defaults for GROWTH MILE document generation
 # Usage: pandoc --defaults=docs/templates/latex/defaults.yaml input.md -o output.pdf
 
 # PDF engine (XeLaTeX for CJK support)
