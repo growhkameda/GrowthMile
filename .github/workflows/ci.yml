@@ -21,7 +21,10 @@ env:
   DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
   AUTH_SECRET: ci-placeholder-secret-at-least-32-chars
   AUTH_URL: http://localhost:3000
-  NODE_ENV: development
+  # NODE_ENV は明示しない。next build / next dev / vitest が自動的に production / development / test を設定する。
+  # 手動指定すると Next.js 16 の "_not-found" プリレンダリングで useContext null エラーが発生する既知のリグレッション
+  # （vercel/next.js#86146）に該当するため、ここでは設定しない。
+  # 参考: https://nextjs.org/docs/messages/non-standard-node-env
 
 jobs:
   lint-markdown:
