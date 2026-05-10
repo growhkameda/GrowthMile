@@ -1,0 +1,11 @@
+# CODEOWNERS（GitHub）
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# チームや別ユーザーを追加する場合は @ユーザー名 または @組織/チーム名 に変更してください。
+
+* @growhkameda
+
+/.github/workflows/ @growhkameda
+/docker-compose*.yml @growhkameda
+/prisma/ @growhkameda
+/src/ @growhkameda

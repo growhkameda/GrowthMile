@@ -1,0 +1,7 @@
+* text=auto
+
+# シェルスクリプトやgradlewは、Windows環境でも必ずLF（Unix改行コード）で保存・チェックアウトする
+*.sh text eol=lf
+gradlew text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf

@@ -1,0 +1,29 @@
+# AIのコンテキストノイズを除外するための設定（Codebase Indexing対象外）
+
+# テストエビデンス（バイナリ・大容量データ）
+docs/evidence/
+
+# AIプロンプトの補助ファイルや古いルール
+.claude/
+.agent/
+
+# ビルド成果物・キャッシュ
+dist/
+dist-ssr/
+build/
+.gradle/
+coverage/
+
+# 外部ライブラリ
+node_modules/
+
+# バイナリ・メディアファイル
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.gif
+**/*.webp
+**/*.svg
+**/*.pdf
+**/*.jar
+**/*.war

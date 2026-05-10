@@ -1,0 +1,231 @@
+---
+description: "プロジェクト固有の技術スタックとコーディング規約"
+globs: "**/*"
+alwaysApply: true
+---
+
+# プロジェクト固有ルール
+
+## 技術スタック
+
+- **フレームワーク**: Next.js 16 (App Router) / TypeScript
+- **スタイリング**: Tailwind CSS v4
+- **ORM**: Prisma（型は自動生成を必ず使用。`any` 禁止）
+- **認証**: NextAuth.js (Auth.js v5)
+- **DB**: PostgreSQL
+- **バリデーション**: Zod（API Routes / Server Actions / env 全入力に必須）
+- **UIグローバル状態**: Zustand（モーダル・通知等の純粋 UI 状態のみ。サーバー状態は使用禁止）
+- **コードフォーマット**: Prettier + prettier-plugin-tailwindcss
+- **コミットフック**: Husky + lint-staged + commitlint
+- **テスト**: Vitest + Testing Library (UT) / Playwright (E2E)
+
+## 命名規則
+
+- 関数・変数: キャメルケース (camelCase)
+- コンポーネント・クラス: パスカルケース (PascalCase)
+- App Router のファイル名: Next.js 規約に従う（`page.tsx`, `layout.tsx`, `route.ts` 等）
+- Prisma モデル名: パスカルケース (例: `User`, `Post`)
+- DB カラム名: スネークケース (例: `created_at`)
+
+## エラーハンドリング
+
+- カスタムエラークラスの使用が必須です。生の `Error` を投げたり、例外を捨てたりしないでください。
+- API Routes では適切な HTTP ステータスコードと JSON エラーレスポンスを返すこと。
+
+## コメント規約
+
+リーダブルコード（Dustin Boswell & Trevor Foucher）の原則に従ってコメントを記述すること。
+
+- **Why を書く**: コードを読めば分かる What（何をしているか）ではなく、Why（なぜそうするか）・背景・意図を書く
+- **複雑な処理・非自明なロジック・副作用・前提条件**には必ずコメントを付ける
+- 冗長なコメントは禁止（例: `i++; // i をインクリメントする`）
+- コード変更時はコメントも同時に更新する
+
+### TypeScript / React / Next.js
+
+- エクスポートされる関数・コンポーネントには JSDoc (`/** */`) を記述する
+- 型定義だけでは表現できない制約・API 仕様・バリデーション条件はコメントで補足する
+- 複雑な非同期処理・副作用には処理の意図をインラインコメントで説明する
+
+<!-- ============================================================
+  以下はプロジェクト固有のパターンです。
+  発見した落とし穴や必須パターンを随時追記してください。
+============================================================ -->
+
+## プロジェクト固有パターン
+
+### Server Components / Client Components の境界
+
+`"use client"` ディレクティブは必要最小限にとどめること。
+
+**理由**: Client Components が増えるとバンドルサイズが増大し、Server-side Rendering の恩恵を失う。
+状態管理・イベントハンドラが不要なコンポーネントは Server Components として実装すること。
+
+```tsx
+// NG: 不要な "use client"（静的なコンポーネントで使用）
+"use client"
+export function StaticCard({ title }: { title: string }) {
+  return <div>{title}</div>
+}
+
+// OK: Server Component（デフォルト）
+export function StaticCard({ title }: { title: string }) {
+  return <div>{title}</div>
+}
+```
+
+### NextAuth.js セッション取得パターン
+
+Server Components では `auth()` を直接呼び出し、Client Components では `useSession()` を使用すること。
+
+```tsx
+// Server Component での認証チェック
+import { auth } from "@/lib/auth"
+
+export default async function ProtectedPage() {
+  const session = await auth()
+  if (!session) redirect("/login")
+  return <div>Protected content</div>
+}
+```
+
+### middleware.ts による Route 保護
+
+認証が必要なルートは `middleware.ts` で一括保護すること。
+
+**理由**: 各ページに個別でセッションチェックを書くと漏れが発生する。
+
+```ts
+// middleware.ts
+export { auth as middleware } from "@/lib/auth"
+
+export const config = {
+  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|login).*)"],
+}
+```
+
+### Prisma クライアントのシングルトン
+
+開発環境での Hot Reload によるコネクション枯渇を防ぐため、`src/lib/db.ts` でシングルトンを必ず使用すること。
+
+```ts
+// src/lib/db.ts
+import { PrismaClient } from "@prisma/client"
+
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
+
+export const prisma = globalForPrisma.prisma ?? new PrismaClient()
+
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma
+```
+
+### API Routes のレスポンス型
+
+`src/app/api/` 配下の API Routes は `NextResponse.json()` を使い、必ずレスポンス型を明示すること。
+
+```ts
+// NG: 型なし
+return NextResponse.json({ data })
+
+// OK: 型付き
+return NextResponse.json<ApiResponse<User>>({ data: user })
+```
+
+### Zod によるバリデーション必須パターン
+
+API Routes および Server Actions への全入力は Zod でバリデーションすること。
+
+**理由**: TypeScript の型はコンパイル時のみ有効。実行時に外部からの不正入力を防ぐには Zod による実行時バリデーションが必要。
+
+```ts
+// src/app/api/posts/route.ts
+import { z } from "zod"
+
+const createPostSchema = z.object({
+  title: z.string().min(1).max(100),
+  body: z.string().min(1),
+})
+
+export async function POST(request: Request) {
+  const result = createPostSchema.safeParse(await request.json())
+  if (!result.success) {
+    return NextResponse.json({ error: result.error.flatten() }, { status: 400 })
+  }
+  // result.data は型安全
+}
+```
+
+### useOptimistic によるイイネ等の楽観的更新
+
+イイネ・フォロー等のサーバー状態変更は `useOptimistic` で即時 UI 反映し、Server Action で DB 更新すること。
+Zustand をサーバー状態管理に使わないこと。
+
+**理由**: Zustand はキャッシュ無効化・再フェッチの仕組みを持たず、サーバー状態と UI が乖離する。
+
+```tsx
+"use client"
+import { useOptimistic, useTransition } from "react"
+import { toggleLike } from "@/features/like/actions"
+
+export function LikeButton({ postId, initialCount, initialLiked }: LikeButtonProps) {
+  const [isPending, startTransition] = useTransition()
+  const [optimistic, setOptimistic] = useOptimistic(
+    { count: initialCount, liked: initialLiked },
+    (state, liked: boolean) => ({ count: state.count + (liked ? 1 : -1), liked })
+  )
+
+  function handleClick() {
+    startTransition(async () => {
+      setOptimistic(!optimistic.liked)
+      await toggleLike(postId)
+    })
+  }
+
+  return (
+    <button onClick={handleClick} disabled={isPending}>
+      {optimistic.liked ? "♥" : "♡"} {optimistic.count}
+    </button>
+  )
+}
+```
+
+### Zustand の使用スコープ
+
+Zustand はサーバーデータを持たない純粋な UI 状態管理のみに使うこと。
+
+```ts
+// OK: モーダル・通知・UI 設定
+interface UIStore {
+  isModalOpen: boolean
+  openModal: () => void
+  closeModal: () => void
+}
+
+// NG: イイネ数・投稿リスト等のサーバーデータを Zustand で管理
+```
+
+### 環境変数バリデーション（t3-env パターン）
+
+`src/env.ts` で環境変数を Zod スキーマで定義し、起動時に型チェックすること。
+未定義・型違いの環境変数で本番デプロイが壊れる事故を防ぐ。
+
+```ts
+// src/env.ts
+import { createEnv } from "@t3-oss/env-nextjs"
+import { z } from "zod"
+
+export const env = createEnv({
+  server: {
+    DATABASE_URL: z.string().url(),
+    NEXTAUTH_SECRET: z.string().min(32),
+  },
+  client: {
+    NEXT_PUBLIC_APP_URL: z.string().url().optional(),
+  },
+  runtimeEnv: {
+    DATABASE_URL: process.env.DATABASE_URL,
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+  },
+})
+```

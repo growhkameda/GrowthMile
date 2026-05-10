@@ -1,0 +1,9 @@
+.next/
+out/
+node_modules/
+coverage/
+e2e/node_modules/
+prisma/migrations/
+*.md
+tmpapp/
+src/generated/

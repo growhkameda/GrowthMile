@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Write",
+      "Bash(npm run dev)",
+      "Bash(npm run build)",
+      "Bash(npm run lint)",
+      "Bash(npm run preview)",
+      "Bash(./gradlew bootRun)",
+      "Bash(./gradlew clean build)",
+      "Bash(./gradlew test)",
+      "Bash(./gradlew test --tests *)",
+      "Bash(docker-compose up -d)",
+      "Bash(docker-compose down)",
+      "Bash(docker-compose logs *)",
+      "Bash(docker-compose exec *)",
+      "Bash(docker-compose run --rm *)",
+      "Bash(markdownlint *)",
+      "Bash(\"C:/Program Files/Git/bin/bash.exe\" scripts/*)",
+      "Bash(bash scripts/*)",
+      "Bash(npx mmdc *)",
+      "Bash(npm run diagrams*)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(nc *)",
+      "Bash(ping *)",
+      "Bash(telnet *)",
+      "Bash(ftp *)",
+      "Bash(sftp *)",
+      "Bash(ssh *)",
+      "Bash(scp *)",
+      "Bash(git push *)",
+      "Bash(npm publish *)",
+      "Bash(pip install *)",
+      "Bash(npx *)"
+    ]
+  }
+}

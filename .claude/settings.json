@@ -1,0 +1,135 @@
+﻿{
+  "model": "claude-sonnet-4-6",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Write",
+      "Bash(npm run dev)",
+      "Bash(npm run test*)",
+      "Bash(npm run build)",
+      "Bash(npm run lint)",
+      "Bash(npm run start*)",
+      "Bash(npm ci)",
+      "Bash(npm install --no-audit)",
+      "Bash(npx prisma *)",
+      "Bash(npx playwright *)",
+      "Bash(npx markdownlint-cli *)",
+      "Bash(npx mmdc *)",
+      "Bash(docker compose up *)",
+      "Bash(docker compose down *)",
+      "Bash(docker compose logs *)",
+      "Bash(docker compose exec *)",
+      "Bash(docker compose run --rm *)",
+      "Bash(docker-compose logs *)",
+      "Bash(docker-compose exec *)",
+      "Bash(docker-compose run --rm *)",
+      "Bash(markdownlint *)",
+      "Bash(\"C:/Program Files/Git/bin/bash.exe\" scripts/*)",
+      "Bash(bash scripts/*)",
+      "Bash(git commit --trailer \"Made-with: Cursor\":*)",
+      "Bash(npm run diagrams*)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(nc *)",
+      "Bash(ping *)",
+      "Bash(telnet *)",
+      "Bash(ftp *)",
+      "Bash(sftp *)",
+      "Bash(ssh *)",
+      "Bash(scp *)",
+      "Bash(git push *)",
+      "Bash(npm publish *)",
+      "Bash(pip install *)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/inject-session-context.sh",
+            "timeout": 15,
+            "statusMessage": "Loading session context..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard-dangerous-bash.sh",
+            "timeout": 10,
+            "statusMessage": "Checking command safety..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard-sensitive-files.sh",
+            "timeout": 10,
+            "statusMessage": "Checking file protection..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/lint-on-write.sh",
+            "async": true,
+            "timeout": 120
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/remind-evidence-on-fail.sh",
+            "timeout": 10,
+            "statusMessage": "Checking for build/test failures..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "You are a quality gate evaluating whether Claude should stop working.\nRespond ONLY with JSON. No prose, no Markdown.\n\nContext: $ARGUMENTS\n\nEvaluate IN ORDER. Return the FIRST matching rule:\n\n1. If stop_hook_active is true in the context, respond {\"ok\": true}\n2. If the conversation contains any CI/build/test/lint/Playwright failure AND this session has NOT written to docs/evidence/ via Write or Edit, respond {\"ok\": false, \"reason\": \"rework-report skill must be invoked and evidence saved to docs/evidence/ before stopping. See CLAUDE.md.\"}\n3. If any *.ts, *.tsx, *.java, or *.yml files were changed AND both build-verifier and code-reviewer SubAgents have NOT been invoked in this session, respond {\"ok\": false, \"reason\": \"CLAUDE.md requires running build-verifier and code-reviewer after code changes.\"}\n4. If there are unresolved lint errors that Claude was asked to fix but has not fixed yet, or explicitly requested tasks that are clearly incomplete, respond {\"ok\": false, \"reason\": \"<specific description>\"}\n5. Otherwise respond {\"ok\": true}\n\nBe conservative - only block if there is clear evidence of an unfulfilled request.",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/remind-evidence-on-fail.sh",
+            "timeout": 10,
+            "statusMessage": "Checking for build/test failures..."
+          }
+        ]
+      }
+    ]
+  }
+}

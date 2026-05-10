@@ -1,0 +1,73 @@
+---
+# pandoc defaults for PreZen document generation
+# Usage: pandoc --defaults=docs/templates/latex/defaults.yaml input.md -o output.pdf
+
+# PDF engine (XeLaTeX for CJK support)
+pdf-engine: xelatex
+
+# Language
+lang: ja
+
+# Table of contents
+toc: true
+toc-depth: 3
+
+# Syntax highlighting
+highlight-style: tango
+
+# Variables
+variables:
+  # Japanese font (available in pandoc/extra Docker image)
+  CJKmainfont: "Noto Sans CJK JP"
+  mainfont: "Noto Sans CJK JP"
+  monofont: "Noto Sans Mono CJK JP"
+  fontsize: 10pt
+
+  # Page geometry
+  geometry:
+    - margin=25mm
+
+  # Document class
+  documentclass: ltjarticle
+
+  # Colors
+  linkcolor: "blue"
+  urlcolor: "blue"
+  toccolor: "black"
+
+# Header includes (LaTeX preamble)
+header-includes:
+  # Table formatting
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage{array}
+  - \usepackage{multirow}
+
+  # Page layout
+  - \usepackage{fancyhdr}
+  - \pagestyle{fancy}
+  - \fancyhf{}
+  - \fancyhead[L]{\footnotesize\leftmark}
+  - \fancyhead[R]{\footnotesize\thepage}
+  - \fancyfoot[C]{\footnotesize CONFIDENTIAL - 社外秘}
+  - \renewcommand{\headrulewidth}{0.4pt}
+  - \renewcommand{\footrulewidth}{0.4pt}
+
+  # Better line breaks in tables
+  - \usepackage{makecell}
+  - \renewcommand\theadfont{\bfseries}
+
+  # Color support
+  - \usepackage{xcolor}
+  - \definecolor{linkblue}{HTML}{2563EB}
+  - \hypersetup{colorlinks=true,linkcolor=linkblue,urlcolor=linkblue}
+
+  # Code block styling
+  - \usepackage{framed}
+  - \definecolor{shadecolor}{HTML}{F3F4F6}
+
+  # Prevent images from overflowing
+  - \usepackage{graphicx}
+  - \makeatletter
+  - \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+  - \makeatother
