@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Scaffolding temp directory
     "tmpapp/**",
+    // V0 design mock (reference only, not part of main app)
+    "employee-appreciation-app/**",
     // Prisma generated client
     "src/generated/**",
   ]),

@@ -9,9 +9,9 @@ import { authConfig } from "@/auth.config"
  *
  * - `authConfig`（Edge Runtime 互換ベース設定）を展開し、PrismaAdapter と Credentials プロバイダーを追加する。
  * - `session.strategy = "jwt"` を採用。Credentials プロバイダーは DB セッション戦略と相性が悪く、
- *   JWT 戦略の方が Edge Runtime（middleware）でも検証コストが低いため。
+ *   JWT 戦略の方が Edge Runtime（proxy）でも検証コストが低いため。
  * - `Credentials` プロバイダーはスケルトン状態。`authorize` は `null` を返すので現時点ではログインは通らないが、
- *   ルートハンドラ（`/api/auth/[...nextauth]`）と middleware の配線確認のために最低 1 つ provider を置いておく。
+ *   ルートハンドラ（`/api/auth/[...nextauth]`）と proxy の配線確認のために最低 1 つ provider を置いておく。
  * - 実際のメール+パスワード検証（bcrypt + DB 照合）は `feat: ログイン機能` の別タスクで `authorize` 内に実装する。
  */
 export const { handlers, auth, signIn, signOut } = NextAuth({

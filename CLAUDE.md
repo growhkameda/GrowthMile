@@ -32,10 +32,10 @@
 - **E2E lock ファイル再生成**: `cd e2e && npm install --no-audit`（`e2e/` は workspace 外のため個別管理）
 - **Root lock ファイル再生成**: `npm install --no-audit`（ルートの依存関係変更時）
 - **コーディング規約**: キャメルケース（関数/変数）、パスカルケース（コンポーネント/クラス）、`any` 型禁止、`"use client"` は必要最小限
-- **モデル選定**: デフォルトは `claude-sonnet-4-6`。大規模リファクタリング・セキュリティ審査・深いデバッグは `claude-opus-4-6` へエスカレーション。詳細は `AGENTS.md` セクション6を参照。
+- **モデル選定**: ティア運用（バージョン固定しない）。通常は Sonnet 最新（`default`）、レビュー・セキュリティ・深いデバッグは Opus 最新（`escalation`）。SSOT: [`docs/agentic/model-policy.md`](docs/agentic/model-policy.md)
 - 詳細な運用・ワークフローは `.claude/workflows/` および `.claude/rules/` を参照すること。
 - **ルール・スキル・ワークフローの完全実行（省略禁止）**: トークン消費量・コンテキスト圧迫を理由に、定義されたルール・SubAgent・スキル・ワークフローを省略・簡略化・後回しにすることを禁止する。「コストを抑えるため省略します」「必要があれば実行します」は禁止。
-  - コード変更後は必ず `build-verifier`（Lint・ビルド・テスト）と `code-reviewer`（Opus）を起動し、結果が揃ってからユーザーに報告する
+  - コード変更後は必ず `build-verifier`（Lint・ビルド・テスト、`default` / Sonnet 最新）と `code-reviewer`（`escalation` / Opus 最新）を起動し、結果が揃ってからユーザーに報告する
   - FAIL / NEEDS_HUMAN_REVIEW 時は必ず `rework-report` スキルを起動してエビデンスを保存する
   - ワークフロー（`implement-and-verify.md` 等）の各ステップはすべて実行する
 - **失敗・差し戻し発生時（ローカル・CI どちらも対象）**: 以下のいずれかが発生した場合は、必ず `.claude/skills/rework-report/SKILL.md` スキルを起動し、Evidence Bundle を `docs/evidence/` 配下に保存してからユーザーに報告すること。
