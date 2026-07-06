@@ -2,45 +2,30 @@
 
 # Claude Code 設定 (CLAUDE.md)
 
-このプロジェクトの全体コンテキスト、アーキテクチャ、AIエージェントの役割分担についての最新のガイドラインは、プロジェクトルートの `AGENTS.md` に記載されています。
-上記のメタタグにより、本設定ファイルとあわせて `AGENTS.md` も読み込まれます。
+プロジェクトの全体コンテキストは `AGENTS.md`（上記メタタグで自動読込）、詳細ルールは `.claude/rules/` に分割されています。
 
 **このプロジェクトは Claude Code が唯一のAIエージェントとして全工程（要件定義・設計・実装・検証・コミット）を担当します。**
 
-## WHAT (技術スタック・プロジェクト構造)
+## WHAT（プロジェクト）
 
 - **Project Name**: GROWTH MILE
-- **技術スタック**: Next.js 16 (App Router) / TypeScript / Tailwind CSS v4 / Prisma / NextAuth.js (Auth.js v5) / PostgreSQL / Zod / Zustand (UI状態) / Prettier / Vitest + Testing Library / Playwright
-- **構造**: `src/` (app, components, features, lib), `prisma/`, `docs/`, `e2e/`
+- **技術スタック**: Next.js 16 (App Router) / TypeScript / Tailwind CSS v4 / Prisma / Auth.js v5 / PostgreSQL / Zod / Zustand / Vitest / Playwright
+- 詳細: `.claude/rules/project-stack.md`
 
-## Detail (プロジェクト詳細)
+## HOW（コマンド・ルール構成）
 
--
+- 主要コマンド: `.claude/rules/project-ops.md` を参照（起動 `npm run dev` / テスト `npm run test` / ビルド `npm run build`）
+- ルールは2層構成:
+  - `.claude/rules/core-*.md` — 汎用（原則・ガードレール・設計・堅牢性・テスト・セキュリティ・ドキュメント・Git/CI・AIワークフロー）
+  - `.claude/rules/project-*.md` — このプロジェクト固有（スタック・コマンド・CI）
+- 開発フェーズの手順: `.claude/workflows/`（`full-dev-cycle.md` が全体像）
 
-## HOW (主要コマンド・規約)
+## 絶対遵守（要点）
 
-- **アプリ起動**: `npm run dev`
-- **ビルド**: `npm run build`
-- **テスト**: `npm run test`（Vitest）
-- **Lint**: `npm run lint`（ESLint）
-- **フォーマット**: `npm run format`（Prettier 自動修正）
-- **フォーマットチェック**: `npm run format:check`（CI 用、修正なし）
-- **DB マイグレーション**: `npx prisma migrate dev`
-- **Prisma 型生成**: `npx prisma generate`
-- **ローカル DB 起動**: `docker compose up -d db`
-- **E2Eテスト実行**: `cd e2e && npx playwright test`（アプリ起動中に実行）
-- **E2E lock ファイル再生成**: `cd e2e && npm install --no-audit`（`e2e/` は workspace 外のため個別管理）
-- **Root lock ファイル再生成**: `npm install --no-audit`（ルートの依存関係変更時）
-- **コーディング規約**: キャメルケース（関数/変数）、パスカルケース（コンポーネント/クラス）、`any` 型禁止、`"use client"` は必要最小限
-- **モデル選定**: ティア運用（バージョン固定しない）。通常は Sonnet 最新（`default`）、レビュー・セキュリティ・深いデバッグは Opus 最新（`escalation`）。SSOT: [`docs/agentic/model-policy.md`](docs/agentic/model-policy.md)
-- 詳細な運用・ワークフローは `.claude/workflows/` および `.claude/rules/` を参照すること。
-- **ルール・スキル・ワークフローの完全実行（省略禁止）**: トークン消費量・コンテキスト圧迫を理由に、定義されたルール・SubAgent・スキル・ワークフローを省略・簡略化・後回しにすることを禁止する。「コストを抑えるため省略します」「必要があれば実行します」は禁止。
-  - コード変更後は必ず `build-verifier`（Lint・ビルド・テスト、`default` / Sonnet 最新）と `code-reviewer`（`escalation` / Opus 最新）を起動し、結果が揃ってからユーザーに報告する
-  - FAIL / NEEDS_HUMAN_REVIEW 時は必ず `rework-report` スキルを起動してエビデンスを保存する
-  - ワークフロー（`implement-and-verify.md` 等）の各ステップはすべて実行する
-- **失敗・差し戻し発生時（ローカル・CI どちらも対象）**: 以下のいずれかが発生した場合は、必ず `.claude/skills/rework-report/SKILL.md` スキルを起動し、Evidence Bundle を `docs/evidence/` 配下に保存してからユーザーに報告すること。
-  - ローカル Bash コマンド（`docker compose exec`・`npm run test` 等）が非ゼロで終了した
-  - 会話上で CI パイプライン失敗・E2E 失敗・ビルドエラーが観測された（コマンドが失敗しなくてもログや報告から失敗が分かった場合も含む）
-  - `code-reviewer` が FAIL / NEEDS_HUMAN_REVIEW を返した
-  - **「後で保存する」「今回は省略する」は禁止。失敗を観測した直後に保存すること。**
-- **禁止行為**: .env / .env.* ファイルの内容を AI が自動探索・解析しないこと。必要な値は人間が明示的にチャットへ貼る。パス探索も最小限に留める。
+- **タスク受領時に複雑度トリアージ（LIGHT / STANDARD / COMPLEX）を宣言する。COMPLEX は `deep-plan` → `plan-reviewer` を経てから実装、STANDARD 以上は完了報告前に `self-review` を実行する**（`core-cognition.md`）
+- **コード変更後は必ず `build-verifier`（default / Sonnet 最新）と `code-reviewer`（escalation / Opus 最新）を起動し、両方の結果が揃ってから報告する**
+- **破壊的変更（API シグネチャ・DB スキーマ・import パス・認証ロジック）は自分で判断せず必ずエスカレーションする**
+- **E2E / ST 失敗・NEEDS_HUMAN_REVIEW 時は `rework-report` スキルで Evidence Bundle を `docs/evidence/` に保存してから報告する**（ローカルの lint / build / unit test 失敗はその場で修正、保存不要）
+- **定義されたルール・SubAgent・スキル・ワークフローの省略・簡略化・後回し禁止**
+- **`.env` / `.env.*` の自動探索・解析禁止**（必要な値は人間がチャットに貼る）
+- モデルはティア運用でバージョン固定しない（SSOT: `docs/agentic/model-policy.md`）

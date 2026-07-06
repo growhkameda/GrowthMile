@@ -1,24 +1,31 @@
-﻿#!/usr/bin/env bash
-# PostToolUse hook: Run frontend lint asynchronously after TypeScript/JavaScript file writes.
-# NDA-safe: runs only local docker-compose commands, no external communication.
-# async: true in settings.json 窶・Claude continues working while this runs in background.
+#!/usr/bin/env bash
+# PostToolUse hook: Run ESLint asynchronously after source file writes.
+# NDA-safe: runs entirely local, no external communication.
+# async: true in settings.json - Claude continues working while this runs.
+#
+# [TEMPLATE NOTE] Lint command and source dir are project-specific.
+# Adjust SOURCE_DIR_PATTERN and the lint command when porting to another project.
 
 INPUT=$(cat)
 FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 
+# Normalize Windows backslashes so pattern matching works on any OS
+FILE_NORM=$(echo "$FILE_PATH" | tr '\\' '/')
+
 # Only run for TypeScript/JavaScript source files
-if ! echo "$FILE_PATH" | grep -qE '\.(ts|tsx|js|jsx)$'; then
+if ! echo "$FILE_NORM" | grep -qE '\.(ts|tsx|js|jsx)$'; then
   exit 0
 fi
 
-# Only run for files inside the frontend directory
-if ! echo "$FILE_PATH" | grep -qE '/frontend/'; then
+# Only run for files inside the source directory
+SOURCE_DIR_PATTERN='/src/'
+if ! echo "$FILE_NORM" | grep -qE "$SOURCE_DIR_PATTERN"; then
   exit 0
 fi
 
-# Run frontend lint via docker-compose and capture output (last 40 lines to stay concise)
-RESULT=$(docker-compose -f "$PROJECT_DIR/docker-compose.yml" exec -T frontend npm run lint 2>&1)
+# Lint only the edited file to keep the async run fast
+RESULT=$(cd "$PROJECT_DIR" && npx eslint "$FILE_PATH" 2>&1)
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -eq 0 ]; then

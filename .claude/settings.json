@@ -1,5 +1,6 @@
-﻿{
-  "model": "claude-sonnet-4-6",
+{
+  "model": "opusplan",
+  "alwaysThinkingEnabled": true,
   "permissions": {
     "allow": [
       "Read",
@@ -9,24 +10,21 @@
       "Bash(npm run build)",
       "Bash(npm run lint)",
       "Bash(npm run start*)",
+      "Bash(npm run format*)",
       "Bash(npm ci)",
       "Bash(npm install --no-audit)",
+      "Bash(npx tsc *)",
       "Bash(npx prisma *)",
       "Bash(npx playwright *)",
       "Bash(npx markdownlint-cli *)",
-      "Bash(npx mmdc *)",
       "Bash(docker compose up *)",
       "Bash(docker compose down *)",
       "Bash(docker compose logs *)",
       "Bash(docker compose exec *)",
       "Bash(docker compose run --rm *)",
-      "Bash(docker-compose logs *)",
-      "Bash(docker-compose exec *)",
-      "Bash(docker-compose run --rm *)",
       "Bash(markdownlint *)",
       "Bash(\"C:/Program Files/Git/bin/bash.exe\" scripts/*)",
-      "Bash(bash scripts/*)",
-      "Bash(npm run diagrams*)"
+      "Bash(bash scripts/*)"
     ],
     "deny": [
       "Bash(rm -rf *)",
@@ -39,12 +37,25 @@
       "Bash(sftp *)",
       "Bash(ssh *)",
       "Bash(scp *)",
-      "Bash(git push *)",
+      "Bash(git push --force*)",
       "Bash(npm publish *)",
-      "Bash(pip install *)"
+      "Bash(pip install *)",
+      "Read(.env)",
+      "Read(.env.*)"
     ]
   },
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/triage-reminder.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "matcher": "startup",
@@ -99,20 +110,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/remind-evidence-on-fail.sh",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/remind-evidence-on-e2e-fail.sh",
             "timeout": 10,
-            "statusMessage": "Checking for build/test failures..."
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "You are a quality gate evaluating whether Claude should stop working.\nRespond ONLY with JSON. No prose, no Markdown.\n\nContext: $ARGUMENTS\n\nEvaluate IN ORDER. Return the FIRST matching rule:\n\n1. If stop_hook_active is true in the context, respond {\"ok\": true}\n2. If the conversation contains any CI/build/test/lint/Playwright failure AND this session has NOT written to docs/evidence/ via Write or Edit, respond {\"ok\": false, \"reason\": \"rework-report skill must be invoked and evidence saved to docs/evidence/ before stopping. See CLAUDE.md.\"}\n3. If any *.ts, *.tsx, *.java, or *.yml files were changed AND both build-verifier and code-reviewer SubAgents have NOT been invoked in this session, respond {\"ok\": false, \"reason\": \"CLAUDE.md requires running build-verifier and code-reviewer after code changes.\"}\n4. If there are unresolved lint errors that Claude was asked to fix but has not fixed yet, or explicitly requested tasks that are clearly incomplete, respond {\"ok\": false, \"reason\": \"<specific description>\"}\n5. Otherwise respond {\"ok\": true}\n\nBe conservative - only block if there is clear evidence of an unfulfilled request.",
-            "timeout": 30
+            "statusMessage": "Checking for E2E failures..."
           }
         ]
       }
@@ -123,9 +123,20 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/remind-evidence-on-fail.sh",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/remind-evidence-on-e2e-fail.sh",
             "timeout": 10,
-            "statusMessage": "Checking for build/test failures..."
+            "statusMessage": "Checking for E2E failures..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "You are a quality gate evaluating whether Claude should stop working.\nRespond ONLY with JSON. No prose, no Markdown.\n\nContext: $ARGUMENTS\n\nEvaluate IN ORDER. Return the FIRST matching rule:\n\n1. If stop_hook_active is true in the context, respond {\"ok\": true}\n2. If the conversation contains a Playwright/E2E test failure or an ST rework notification AND this session has NOT written to docs/evidence/ via Write or Edit, respond {\"ok\": false, \"reason\": \"rework-report skill must be invoked and evidence saved to docs/evidence/ before stopping (E2E/ST failures only). See core-ai-workflow.md.\"}\n3. If any source files (*.ts, *.tsx, *.js, *.jsx, *.java) were changed AND both build-verifier and code-reviewer SubAgents have NOT been invoked in this session, respond {\"ok\": false, \"reason\": \"core-ai-workflow.md requires running build-verifier and code-reviewer after code changes.\"}\n4. If there are unresolved lint errors that Claude was asked to fix but has not fixed yet, or explicitly requested tasks that are clearly incomplete, respond {\"ok\": false, \"reason\": \"<specific description>\"}\n5. Otherwise respond {\"ok\": true}\n\nBe conservative - only block if there is clear evidence of an unfulfilled request. Local lint/build/unit-test failures do NOT require evidence files.",
+            "timeout": 30
           }
         ]
       }

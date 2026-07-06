@@ -47,7 +47,7 @@ docs/design/mockups/{画面名}-{テーマ}.html
 - `html { font-size: 118% }` を適用
 - ダーク/ライト両対応の場合は `[data-theme="light"]` / `[data-theme="dark"]` 構造を使用
 - テーマ切替トグル（スライドノブ + SVGアイコン）を実装
-- `.claude/rules/ui-design.md` のUIルールに準拠
+- `.claude/rules/core-frontend.md` と `.claude/rules/project-stack.md` のUIルールに準拠
 
 ### 禁止事項
 
@@ -86,5 +86,6 @@ docs/design/mockups/{画面名}-{テーマ}.html
 ## 参照
 
 - デザイン仕様: [`docs/design/spec-design-system.md`](../../docs/design/spec-design-system.md)
-- UIルール: [`.claude/rules/ui-design.md`](../rules/ui-design.md)
+- UIルール: [`.claude/rules/core-frontend.md`](../rules/core-frontend.md) / [`.claude/rules/project-stack.md`](../rules/projec
+-stack.md)
 - モックアップ一覧: [`docs/design/mockups/README.md`](../../docs/design/mockups/README.md)

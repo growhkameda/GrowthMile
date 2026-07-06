@@ -171,7 +171,7 @@ font-family: "JetBrains Mono", monospace;
 
 ---
 
-## 6. Claude Code UI ルール（`.claude/rules/ui-design.md` を更新）
+## 6. Claude Code UI ルール（`.claude/rules/core-frontend.md（汎用）/ .claude/rules/project-stack.md（固有トークン）` を更新）
 
 ```markdown
 # [プロジェクト名] UI Design Rules
@@ -254,6 +254,6 @@ font-family: "JetBrains Mono", monospace;
 - [ ] ブランドカラーを `--accent` に設定（ライト/ダーク両方）
 - [ ] UIフォントを選定してGoogle Fontsリンクを更新
 - [ ] `html { font-size: 118% }` を `index.css` に追記
-- [ ] `.claude/rules/ui-design.md` を更新してAIルールを設定
+- [ ] `.claude/rules/core-frontend.md（汎用）/ .claude/rules/project-stack.md（固有トークン）` を更新してAIルールを設定
 - [ ] `docs/design/spec-design-system.md` をプロジェクト固有情報で記入
 - [ ] ダーク/ライトモード両方でデザインを確認

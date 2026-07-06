@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # PreToolUse hook: Block dangerous bash commands before Claude executes them.
 # NDA-safe: runs entirely local, no external communication.
 # Complements the deny list in permissions by adding logic-based blocking.

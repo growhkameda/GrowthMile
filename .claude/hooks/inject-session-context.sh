@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # SessionStart hook: Inject git status and project progress context into Claude's session.
 # NDA-safe: reads only local files, no external communication.
 # Fires only on new session startup (matcher: "startup").

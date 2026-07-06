@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="ja" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GROWTH MILE — リデザイン・モック（遊び心・ゲーム感）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  /* =========================================================
+     GROWTH MILE — Design Tokens
+     方向性: 遊び心・ゲーム感（成長＝マイルストーン）
+     ※ ライト/ダーク両対応。色はすべて CSS 変数で定義。
+     ========================================================= */
+  :root[data-theme="light"] {
+    --bg:        #FBF6EE;   /* 温かいペーパー */
+    --bg-tint:   #F3EADB;
+    --surface:   #FFFFFF;
+    --surface-2: #F6EFE3;
+    --ink:       #2A2336;   /* プラム・インク */
+    --ink-soft:  #6E6680;
+    --ink-faint: #A49CB4;
+    --line:      #ECE0CE;
+
+    --brand:      #15B877;  /* グロース・グリーン */
+    --brand-ink:  #064f37;
+    --brand-soft: #DEF6EC;
+
+    --coin:      #F5A314;   /* ポイント＝ゴールド */
+    --coin-ink:  #6c4406;
+    --coin-soft: #FCEBC9;
+
+    --gacha:     #E84B92;   /* ガチャ＝フェスティブ・ピンク */
+    --gacha-2:   #8A4CF0;   /* グラデ相方の紫 */
+    --gacha-soft:#FBE2EF;
+
+    --sky:       #2E9BD6;
+    --sky-soft:  #DCF0FB;
+
+    --danger:    #E5484D;
+
+    --shadow: 0 6px 18px rgba(42,35,54,.08);
+    --shadow-pop: 0 10px 26px rgba(138,76,240,.16);
+  }
+  :root[data-theme="dark"] {
+    --bg:        #181226;
+    --bg-tint:   #211934;
+    --surface:   #241B38;
+    --surface-2: #2E2446;
+    --ink:       #F4EFFA;
+    --ink-soft:  #BBB1D4;
+    --ink-faint: #7E7498;
+    --line:      #382C52;
+
+    --brand:      #2BD18C;
+    --brand-ink:  #032b1d;
+    --brand-soft: #143b2e;
+
+    --coin:      #FBB733;
+    --coin-ink:  #3a2606;
+    --coin-soft: #3d2f12;
+
+    --gacha:     #F368A8;
+    --gacha-2:   #A06BFF;
+    --gacha-soft:#3a2348;
+
+    --sky:       #54B6EC;
+    --sky-soft:  #16344a;
+
+    --danger:    #FF6166;
+
+    --shadow: 0 8px 22px rgba(0,0,0,.35);
+    --shadow-pop: 0 12px 30px rgba(160,107,255,.28);
+  }
+
+  /* shapes */
+  :root{
+    --r-card: 18px;
+    --r-btn: 14px;
+    --r-pill: 999px;
+    --r-badge: 8px;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ font-size:118%; }
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 500px at 80% -10%, var(--bg-tint), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Outfit','Zen Kaku Gothic New',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    transition:background-color .25s ease, color .25s ease;
+    min-height:100vh;
+  }
+  .num{ font-family:'JetBrains Mono',monospace; font-feature-settings:"tnum"; }
+
+  /* ---------- showcase chrome ---------- */
+  .page{ max-width:1180px; margin:0 auto; padding:28px 20px 64px; }
+  .top{
+    display:flex; align-items:flex-start; justify-content:space-between;
+    gap:16px; flex-wrap:wrap; margin-bottom:22px;
+  }
+  .brandmark{ display:flex; align-items:center; gap:12px; }
+  .brandmark .logo{
+    width:46px; height:46px; border-radius:14px;
+    background:linear-gradient(145deg,var(--brand),var(--sky));
+    display:grid; place-items:center; color:#fff; flex:none;
+    box-shadow:var(--shadow);
+  }
+  h1.title{ font-size:1.5rem; font-weight:800; margin:0; letter-spacing:-.01em; }
+  .subtitle{ color:var(--ink-soft); font-size:.82rem; margin-top:2px; }
+
+  .toggle{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--surface); border:1px solid var(--line);
+    color:var(--ink); padding:9px 14px; border-radius:var(--r-pill);
+    cursor:pointer; font-family:inherit; font-size:.82rem; font-weight:600;
+    box-shadow:var(--shadow);
+  }
+  .toggle svg{ width:18px; height:18px; }
+
+  /* token legend */
+  .legend{
+    display:flex; gap:10px; flex-wrap:wrap; margin:0 0 26px;
+  }
+  .swatch{
+    display:flex; align-items:center; gap:8px;
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--r-pill); padding:6px 12px 6px 6px; font-size:.72rem; color:var(--ink-soft);
+  }
+  .dot{ width:18px; height:18px; border-radius:50%; flex:none; }
+
+  /* device grid */
+  .grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr));
+    gap:28px;
+  }
+  .frame-wrap{ display:flex; flex-direction:column; gap:10px; }
+  .frame-label{ font-weight:700; font-size:.9rem; display:flex; align-items:center; gap:8px; }
+  .frame-label .pin{ width:9px;height:9px;border-radius:50%;background:var(--brand); }
+  .frame-note{ color:var(--ink-soft); font-size:.74rem; font-weight:400; }
+
+  .phone{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:30px;
+    padding:10px;
+    box-shadow:var(--shadow);
+  }
+  .screen{
+    background:var(--bg);
+    border-radius:22px;
+    overflow:hidden;
+    height:680px;
+    display:flex; flex-direction:column;
+    position:relative;
+  }
+  .scrollable{ overflow-y:auto; flex:1; }
+  .scrollable::-webkit-scrollbar{ width:0; }
+
+  /* ---------- app header (shared) ---------- */
+  .appbar{
+    padding:14px 14px 10px;
+    background:var(--surface);
+    border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:5;
+  }
+  .appbar-row{ display:flex; align-items:center; justify-content:space-between; }
+  .user{ display:flex; align-items:center; gap:9px; }
+  .avatar{
+    width:38px;height:38px;border-radius:50%;
+    background:linear-gradient(145deg,var(--gacha),var(--gacha-2));
+    color:#fff; display:grid; place-items:center; font-weight:700; font-size:.85rem;
+    border:2px solid var(--surface); box-shadow:0 0 0 2px var(--gacha-soft);
+  }
+  .uname{ font-weight:700; font-size:.9rem; }
+  .ulevel{ font-size:.66rem; color:var(--ink-soft); }
+  .coin-chip{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--coin-soft); color:var(--coin-ink);
+    padding:7px 12px; border-radius:var(--r-pill); font-weight:700; font-size:.82rem;
+  }
+  .coin-chip svg{ width:16px;height:16px; }
+
+  /* mile progress */
+  .mile{
+    margin-top:12px; background:var(--brand-soft); border-radius:14px; padding:10px 12px;
+  }
+  .mile-top{ display:flex; justify-content:space-between; align-items:center; font-size:.7rem; color:var(--brand-ink); font-weight:700; margin-bottom:7px; }
+  .mile-track{ position:relative; height:10px; background:var(--surface); border-radius:var(--r-pill); overflow:hidden; }
+  .mile-fill{ position:absolute; inset:0 35% 0 0; background:linear-gradient(90deg,var(--brand),var(--sky)); border-radius:var(--r-pill); }
+  .mile-flag{ position:absolute; right:33%; top:-4px; transform:translateX(50%); }
+
+  /* nav tabs */
+  .tabs{
+    display:flex; gap:6px; padding:8px 14px; background:var(--surface);
+    border-bottom:1px solid var(--line); position:sticky; top:0; z-index:4;
+  }
+  .tab{
+    flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
+    padding:9px 6px; border-radius:var(--r-btn); font-size:.78rem; font-weight:700;
+    color:var(--ink-soft); cursor:pointer; border:none; background:transparent; font-family:inherit;
+  }
+  .tab svg{ width:16px;height:16px; }
+  .tab.active{ background:var(--ink); color:var(--bg); }
+  .tab.gacha{ color:var(--gacha); }
+  .tab.gacha.active{ background:linear-gradient(135deg,var(--gacha),var(--gacha-2)); color:#fff; }
+
+  /* feed */
+  .feed{ padding:14px; display:flex; flex-direction:column; gap:12px; }
+  .card{
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--r-card); padding:14px;
+  }
+  .thanks-head{ display:flex; align-items:center; gap:8px; font-size:.78rem; margin-bottom:10px; }
+  .mini-av{ width:28px;height:28px;border-radius:50%; display:grid;place-items:center; color:#fff; font-weight:700; font-size:.7rem; flex:none; }
+  .arrow{ color:var(--ink-faint); }
+  .pt-badge{
+    margin-left:auto; background:var(--coin); color:#fff; font-weight:700;
+    font-size:.72rem; padding:3px 9px; border-radius:var(--r-badge);
+    display:inline-flex; align-items:center; gap:4px;
+  }
+  .pt-badge svg{ width:12px;height:12px; }
+  .thanks-msg{ font-size:.86rem; line-height:1.55; color:var(--ink); }
+  .tags{ display:flex; gap:6px; margin-top:11px; flex-wrap:wrap; }
+  .tag{ font-size:.68rem; color:var(--sky); background:var(--sky-soft); padding:3px 9px; border-radius:var(--r-badge); font-weight:600; }
+  .reactions{ display:flex; gap:7px; margin-top:11px; }
+  .react{
+    display:inline-flex; align-items:center; gap:5px; font-size:.72rem; font-weight:600;
+    color:var(--ink-soft); background:var(--surface-2); border:1px solid var(--line);
+    padding:5px 10px; border-radius:var(--r-pill); cursor:pointer;
+  }
+  .react.on{ color:var(--gacha); background:var(--gacha-soft); border-color:transparent; }
+  .react svg{ width:14px;height:14px; }
+
+  /* buttons */
+  .btn{
+    width:100%; border:none; border-radius:var(--r-btn); padding:14px;
+    font-family:inherit; font-weight:700; font-size:.92rem; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .btn-brand{ background:var(--brand); color:#fff; }
+  .btn-gacha{ background:linear-gradient(135deg,var(--gacha),var(--gacha-2)); color:#fff; box-shadow:var(--shadow-pop); }
+  .btn-ghost{ background:var(--surface); color:var(--ink); border:1px solid var(--line); }
+  .btn svg{ width:18px;height:18px; }
+
+  /* ----- login ----- */
+  .login{ flex:1; display:flex; flex-direction:column; padding:30px 22px; }
+  .login-hero{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:14px; }
+  .login-logo{
+    width:74px;height:74px;border-radius:22px;
+    background:linear-gradient(145deg,var(--brand),var(--sky));
+    display:grid;place-items:center;color:#fff; box-shadow:var(--shadow-pop);
+  }
+  .login-title{ font-size:1.55rem; font-weight:800; letter-spacing:-.02em; }
+  .login-tag{ color:var(--ink-soft); font-size:.86rem; line-height:1.6; }
+  .field{ margin-top:12px; }
+  .field label{ display:block; font-size:.72rem; font-weight:700; color:var(--ink-soft); margin-bottom:5px; }
+  .input{
+    width:100%; background:var(--surface); border:1.5px solid var(--line);
+    border-radius:var(--r-btn); padding:13px 14px; font-family:inherit; font-size:.88rem; color:var(--ink);
+  }
+  .input:focus{ outline:none; border-color:var(--brand); }
+  .or{ display:flex; align-items:center; gap:10px; color:var(--ink-faint); font-size:.7rem; margin:16px 0; }
+  .or::before,.or::after{ content:""; flex:1; height:1px; background:var(--line); }
+  .login-foot{ text-align:center; font-size:.74rem; color:var(--ink-soft); margin-top:18px; }
+  .login-foot a{ color:var(--brand); font-weight:700; text-decoration:none; }
+
+  /* ----- post ----- */
+  .post{ padding:16px; display:flex; flex-direction:column; gap:14px; }
+  .section-h{ font-size:.74rem; font-weight:700; color:var(--ink-soft); margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+  .recipient{
+    display:flex; align-items:center; gap:9px; background:var(--surface);
+    border:1.5px dashed var(--line); border-radius:var(--r-card); padding:12px;
+  }
+  .recipient.sel{ border-style:solid; border-color:var(--gacha); background:var(--gacha-soft); }
+  .ta{
+    width:100%; min-height:110px; resize:none; background:var(--surface);
+    border:1.5px solid var(--line); border-radius:var(--r-card); padding:13px;
+    font-family:inherit; font-size:.88rem; color:var(--ink); line-height:1.6;
+  }
+  .ta:focus{ outline:none; border-color:var(--brand); }
+  .pt-pick{ display:flex; gap:8px; }
+  .pt-opt{
+    flex:1; text-align:center; padding:12px 4px; border-radius:var(--r-btn);
+    border:1.5px solid var(--line); background:var(--surface); cursor:pointer;
+    font-weight:700; font-size:.95rem; color:var(--ink);
+  }
+  .pt-opt small{ display:block; font-size:.6rem; color:var(--ink-faint); font-weight:600; }
+  .pt-opt.on{ border-color:var(--coin); background:var(--coin-soft); color:var(--coin-ink); }
+  .tag-pick{ display:flex; gap:7px; flex-wrap:wrap; }
+  .tag-chip{ font-size:.74rem; padding:7px 12px; border-radius:var(--r-pill); border:1.5px solid var(--line); background:var(--surface); color:var(--ink-soft); cursor:pointer; font-weight:600; }
+  .tag-chip.on{ background:var(--sky-soft); color:var(--sky); border-color:transparent; }
+
+  /* ----- gacha ----- */
+  .gacha-screen{ padding:16px; display:flex; flex-direction:column; gap:14px; }
+  .machine{
+    border-radius:var(--r-card); padding:18px;
+    background:linear-gradient(160deg,var(--gacha-soft), var(--surface));
+    border:1px solid var(--line);
+    display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center;
+  }
+  .capsule-stage{ position:relative; width:150px; height:150px; }
+  .reward-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--r-card);
+    padding:12px; display:flex; align-items:center; gap:11px;
+  }
+  .rarity{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:.66rem; padding:3px 7px; border-radius:6px; color:#fff; flex:none; }
+  .r-n{ background:var(--ink-faint); }
+  .r-r{ background:var(--sky); }
+  .r-sr{ background:var(--gacha); }
+  .r-ur{ background:linear-gradient(135deg,var(--coin),var(--gacha)); }
+  .reward-name{ font-size:.84rem; font-weight:700; }
+  .reward-sub{ font-size:.68rem; color:var(--ink-soft); }
+  .reward-when{ margin-left:auto; font-size:.64rem; color:var(--ink-faint); }
+  .balance-row{ display:flex; align-items:center; justify-content:space-between; padding:0 2px; }
+
+  .caption{ text-align:center; color:var(--ink-faint); font-size:.72rem; margin-top:30px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="top">
+    <div class="brandmark">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4l9 3-2 3 2 3-9 1"/><path d="M5 21h-0"/></svg>
+      </div>
+      <div>
+        <h1 class="title">GROWTH MILE — リデザイン案</h1>
+        <div class="subtitle">テーマ: 遊び心・ゲーム感 ／ 全4画面モック（ライト・ダーク対応）</div>
+      </div>
+    </div>
+    <button class="toggle" id="themeBtn" aria-label="テーマ切替">
+      <span id="themeIcon"></span><span id="themeText">ダーク</span>
+    </button>
+  </div>
+
+  <div class="legend" id="legend">
+    <span class="swatch"><span class="dot" style="background:var(--brand)"></span>Brand / Growth</span>
+    <span class="swatch"><span class="dot" style="background:var(--coin)"></span>Points / Gold</span>
+    <span class="swatch"><span class="dot" style="background:var(--gacha)"></span>Gacha / Pink</span>
+    <span class="swatch"><span class="dot" style="background:var(--gacha-2)"></span>Gacha / Violet</span>
+    <span class="swatch"><span class="dot" style="background:var(--sky)"></span>Sky / Tag</span>
+    <span class="swatch">Outfit + Zen Kaku Gothic New + JetBrains Mono</span>
+  </div>
+
+  <div class="grid">
+
+    <!-- ============ LOGIN ============ -->
+    <div class="frame-wrap">
+      <div class="frame-label"><span class="pin"></span>ログイン <span class="frame-note">／ ブランドの第一印象</span></div>
+      <div class="phone"><div class="screen">
+        <div class="login">
+          <div class="login-hero">
+            <div class="login-logo">
+              <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4l9 3-2 3 2 3-9 1"/></svg>
+            </div>
+            <div>
+              <div class="login-title">GROWTH&nbsp;MILE</div>
+              <div class="login-tag">ありがとうが、<br>チームの成長マイルになる。</div>
+            </div>
+          </div>
+          <div>
+            <div class="field">
+              <label>メールアドレス</label>
+              <input class="input" value="hana@growthmile.jp" />
+            </div>
+            <div class="field">
+              <label>パスワード</label>
+              <input class="input" type="password" value="passwordmock" />
+            </div>
+            <button class="btn btn-brand" style="margin-top:16px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+              ログインして冒険を続ける
+            </button>
+            <div class="or">または</div>
+            <button class="btn btn-ghost">
+              <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#EA4335" d="M12 11v3.6h5.1c-.2 1.3-1.6 3.9-5.1 3.9-3.1 0-5.6-2.5-5.6-5.6S8.9 7.3 12 7.3c1.7 0 2.9.7 3.6 1.4l2.5-2.4C16.5 4.7 14.5 4 12 4 7 4 3 8 3 13s4 9 9 9c5.2 0 8.6-3.6 8.6-8.7 0-.6 0-1-.1-1.5H12z"/></svg>
+              Google で続ける
+            </button>
+            <div class="login-foot">はじめての方は <a href="#">アカウント作成</a></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ============ TIMELINE ============ -->
+    <div class="frame-wrap">
+      <div class="frame-label"><span class="pin"></span>タイムライン <span class="frame-note">／ アプリの顔</span></div>
+      <div class="phone"><div class="screen">
+        <div class="appbar">
+          <div class="appbar-row">
+            <div class="user">
+              <div class="avatar">花</div>
+              <div>
+                <div class="uname">山田 花</div>
+                <div class="ulevel">Lv.7 ・ 探検家</div>
+              </div>
+            </div>
+            <div class="coin-chip">
+              <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v10M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <span class="num">1,240</span> pt
+            </div>
+          </div>
+          <div class="mile">
+            <div class="mile-top"><span>今週のありがとうマイル</span><span class="num">13 / 20</span></div>
+            <div class="mile-track">
+              <div class="mile-fill"></div>
+              <div class="mile-flag">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--brand-ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V4l9 2-2 3 2 3-9 1"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tabs">
+          <button class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>タイムライン</button>
+          <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>投稿</button>
+          <button class="tab gacha"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8a3 3 0 1 0-3-3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3 3"/></svg>ガチャ</button>
+        </div>
+        <div class="scrollable">
+          <div class="feed">
+            <div class="card">
+              <div class="thanks-head">
+                <span class="mini-av" style="background:linear-gradient(145deg,var(--sky),var(--brand))">大</span>
+                <strong>大野 健</strong><span class="arrow">→</span>あなた
+                <span class="pt-badge"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg>+30</span>
+              </div>
+              <div class="thanks-msg">リリース前の深夜対応、本当に助かりました！おかげで無事ローンチできたよ。次の打ち上げは私がもつね。</div>
+              <div class="tags"><span class="tag"># チームワーク</span><span class="tag"># 頼れる</span></div>
+              <div class="reactions">
+                <span class="react on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>12</span>
+                <span class="react"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-6 0v4H5l1 11h12l1-11z"/></svg>5</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="thanks-head">
+                <span class="mini-av" style="background:linear-gradient(145deg,var(--gacha),var(--gacha-2))">美</span>
+                <strong>佐藤 美咲</strong><span class="arrow">→</span>田中 翔
+                <span class="pt-badge"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg>+50</span>
+              </div>
+              <div class="thanks-msg">新人さんへのオンボーディング資料、すごく分かりやすかったです。丁寧さに感謝！</div>
+              <div class="tags"><span class="tag"># 親切</span><span class="tag"># ナレッジ共有</span></div>
+              <div class="reactions">
+                <span class="react"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>8</span>
+                <span class="react on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 9V5a3 3 0 0 0-6 0v4H5l1 11h12l1-11z"/></svg>3</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="thanks-head">
+                <span class="mini-av" style="background:linear-gradient(145deg,var(--coin),var(--gacha))">翔</span>
+                <strong>田中 翔</strong><span class="arrow">→</span>あなた
+                <span class="pt-badge"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg>+10</span>
+              </div>
+              <div class="thanks-msg">いつも明るく声をかけてくれてありがとう。チームの雰囲気が良くなってます！</div>
+              <div class="tags"><span class="tag"># ムードメーカー</span></div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ============ POST ============ -->
+    <div class="frame-wrap">
+      <div class="frame-label"><span class="pin"></span>投稿 <span class="frame-note">／ 感謝を送る</span></div>
+      <div class="phone"><div class="screen">
+        <div class="appbar">
+          <div class="appbar-row">
+            <div class="user">
+              <div class="avatar">花</div>
+              <div><div class="uname">感謝を送る</div><div class="ulevel">送れるポイント 残り <span class="num">400</span> pt</div></div>
+            </div>
+            <div class="coin-chip" style="background:var(--brand-soft);color:var(--brand-ink)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              <span class="num">+30</span>
+            </div>
+          </div>
+        </div>
+        <div class="scrollable">
+          <div class="post">
+            <div>
+              <div class="section-h">だれに？</div>
+              <div class="recipient sel">
+                <span class="mini-av" style="background:linear-gradient(145deg,var(--sky),var(--brand))">大</span>
+                <div><div style="font-weight:700;font-size:.86rem">大野 健</div><div style="font-size:.68rem;color:var(--ink-soft)">開発チーム</div></div>
+                <svg style="margin-left:auto" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--gacha)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+            <div>
+              <div class="section-h">メッセージ</div>
+              <textarea class="ta">リリース前の深夜対応、本当に助かりました！おかげで無事ローンチできたよ。</textarea>
+            </div>
+            <div>
+              <div class="section-h">ありがとうポイント</div>
+              <div class="pt-pick">
+                <div class="pt-opt"><span class="num">10</span><small>pt</small></div>
+                <div class="pt-opt on"><span class="num">30</span><small>pt</small></div>
+                <div class="pt-opt"><span class="num">50</span><small>pt</small></div>
+              </div>
+            </div>
+            <div>
+              <div class="section-h">タグ</div>
+              <div class="tag-pick">
+                <span class="tag-chip on"># チームワーク</span>
+                <span class="tag-chip on"># 頼れる</span>
+                <span class="tag-chip"># 親切</span>
+                <span class="tag-chip"># 挑戦</span>
+              </div>
+            </div>
+            <button class="btn btn-brand">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              感謝を送る
+            </button>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ============ GACHA ============ -->
+    <div class="frame-wrap">
+      <div class="frame-label"><span class="pin"></span>ガチャ <span class="frame-note">／ ご褒美・遊びの中心</span></div>
+      <div class="phone"><div class="screen">
+        <div class="appbar">
+          <div class="appbar-row">
+            <div class="user">
+              <div class="avatar">花</div>
+              <div><div class="uname">ごほうびガチャ</div><div class="ulevel">集めて交換しよう</div></div>
+            </div>
+            <div class="coin-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg><span class="num">1,240</span> pt</div>
+          </div>
+        </div>
+        <div class="scrollable">
+          <div class="gacha-screen">
+            <div class="machine">
+              <div class="capsule-stage">
+                <svg viewBox="0 0 150 150" width="150" height="150">
+                  <rect x="34" y="6" width="82" height="78" rx="40" fill="none" stroke="var(--line)" stroke-width="3"/>
+                  <path d="M34 45a41 41 0 0 1 82 0z" fill="var(--gacha)" opacity=".18"/>
+                  <circle cx="60" cy="38" r="11" fill="var(--gacha)"/>
+                  <circle cx="86" cy="34" r="9" fill="var(--coin)"/>
+                  <circle cx="74" cy="58" r="10" fill="var(--sky)"/>
+                  <circle cx="52" cy="62" r="8" fill="var(--gacha-2)"/>
+                  <circle cx="94" cy="58" r="7" fill="var(--brand)"/>
+                  <rect x="44" y="84" width="62" height="46" rx="12" fill="var(--surface-2)" stroke="var(--line)" stroke-width="2"/>
+                  <circle cx="75" cy="100" r="11" fill="none" stroke="var(--gacha)" stroke-width="3"/>
+                  <rect x="60" y="118" width="30" height="9" rx="4" fill="var(--ink-faint)"/>
+                </svg>
+              </div>
+              <div style="font-weight:800;font-size:1.05rem">SR以上 確率 <span class="num" style="color:var(--gacha)">15%</span></div>
+              <button class="btn btn-gacha">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4"/><circle cx="12" cy="12" r="3.5"/></svg>
+                1回まわす（<span class="num">100</span> pt）
+              </button>
+            </div>
+
+            <div class="balance-row">
+              <div class="section-h" style="margin:0">最近の戦利品</div>
+              <span style="font-size:.68rem;color:var(--ink-soft)">すべて見る</span>
+            </div>
+
+            <div class="reward-card">
+              <span class="rarity r-ur">UR</span>
+              <div><div class="reward-name">限定スタンプ「ありがとう侍」</div><div class="reward-sub">激レア ・ コレクション +1</div></div>
+              <span class="reward-when">2分前</span>
+            </div>
+            <div class="reward-card">
+              <span class="rarity r-sr">SR</span>
+              <div><div class="reward-name">カフェチケット 500円</div><div class="reward-sub">交換可能</div></div>
+              <span class="reward-when">昨日</span>
+            </div>
+            <div class="reward-card">
+              <span class="rarity r-r">R</span>
+              <div><div class="reward-name">プロフィール用フレーム</div><div class="reward-sub">装着可能</div></div>
+              <span class="reward-when">3日前</span>
+            </div>
+            <div class="reward-card">
+              <span class="rarity r-n">N</span>
+              <div><div class="reward-name">ボーナス <span class="num">20</span> pt</div><div class="reward-sub">受取済み</div></div>
+              <span class="reward-when">3日前</span>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+  </div>
+
+  <div class="caption">右上のトグルでライト／ダークを切り替え（<span class="num">data-theme</span> を切替）。色はすべて CSS 変数トークンで管理。サーバー不要・このHTMLをブラウザで開くだけ。</div>
+</div>
+
+<script>
+  const sun = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  const moon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+  const root = document.documentElement;
+  const icon = document.getElementById('themeIcon');
+  const text = document.getElementById('themeText');
+  function apply(t){
+    root.setAttribute('data-theme', t);
+    icon.innerHTML = t === 'light' ? moon : sun;
+    text.textContent = t === 'light' ? 'ダーク' : 'ライト';
+  }
+  apply('light');
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    apply(root.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+  });
+</script>
+</body>
+</html>

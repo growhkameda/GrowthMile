@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # PreToolUse hook: Protect sensitive files from Write/Edit operations by Claude.
 # NDA-safe: runs entirely local, no external communication.
 # Prevents accidental overwrite of .env, keys, certificates, and secret files.

@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="ja" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GROWTH MILE — Growth Telemetry（ブループリント版）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+JP:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* =========================================================
+     GROWTH MILE — "Growth Telemetry"
+     コンセプト: チームの成長を測る精密計器(製図/ブループリント)。
+     感謝=計測値、ポイント=走行マイル、タイムライン=計測ログ。
+     frontend-design スキル準拠 — AI既定(黒地+蛍光 / クリーム+セリフ /
+     新聞レイアウト)を回避。ライト=製図ヴェラム、ダーク=サイアノタイプ。
+     色は全て CSS 変数。ネオン/過剰なglow不使用。角は鋭く(精密)。
+     ========================================================= */
+  :root[data-theme="light"]{
+    --paper:#E7ECF1; --surface:#FAFCFD; --panel:#FFFFFF;
+    --grid:rgba(16,33,46,.05); --grid-2:rgba(16,33,46,.10);
+    --ink:#10212E; --ink-soft:#566570; --ink-faint:#90A0AA;
+    --line:#C2CFD8; --line-2:#9AAFBC;
+    --blue:#0E63B8; --blue-soft:#DBEAF7;
+    --cyan:#127E9C;
+    --signal:#DE6E1A; --signal-soft:#F8E3CF;
+    --alert:#CB2540;
+    --shadow:0 1px 0 rgba(16,33,46,.04);
+  }
+  :root[data-theme="dark"]{
+    --paper:#072539; --surface:#0C3148; --panel:#103A55;
+    --grid:rgba(168,206,232,.08); --grid-2:rgba(168,206,232,.16);
+    --ink:#E8F2FB; --ink-soft:#9DBAD0; --ink-faint:#5C7C97;
+    --line:#23527A; --line-2:#3A6C95;
+    --blue:#5CA9F2; --blue-soft:#103a5a;
+    --cyan:#54C6E0;
+    --signal:#F2A24E; --signal-soft:#3a2a16;
+    --alert:#FF6275;
+    --shadow:0 1px 0 rgba(0,0,0,.2);
+  }
+  :root{ --r:3px; }
+
+  *{ box-sizing:border-box; }
+  html{ font-size:118%; }
+  body{
+    margin:0; color:var(--ink);
+    font-family:'IBM Plex Sans JP',system-ui,sans-serif;
+    background-color:var(--paper);
+    background-image:
+      linear-gradient(var(--grid) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid) 1px,transparent 1px),
+      linear-gradient(var(--grid-2) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid-2) 1px,transparent 1px);
+    background-size:18px 18px,18px 18px,90px 90px,90px 90px;
+    -webkit-font-smoothing:antialiased;
+    transition:background-color .25s ease,color .25s ease;
+  }
+  .mono{ font-family:'IBM Plex Mono',monospace; }
+  .disp{ font-family:'Space Grotesk',sans-serif; }
+  .ey{ font-family:'IBM Plex Mono',monospace; font-size:.6rem; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); }
+
+  /* ---------------- showcase chrome ---------------- */
+  .wrap{ max-width:1220px; margin:0 auto; padding:30px 20px 70px; }
+  .head{ display:flex; justify-content:space-between; align-items:flex-start; gap:18px; flex-wrap:wrap; }
+  .brand{ display:flex; gap:14px; align-items:center; }
+  .mk{
+    width:50px; height:50px; flex:none; background:var(--ink); position:relative;
+  }
+  .mk svg{ position:absolute; inset:0; margin:auto; }
+  .head h1{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.5rem; margin:0; letter-spacing:.02em; }
+  .head .sub{ color:var(--ink-soft); font-size:.8rem; margin-top:3px; }
+
+  .tgl{ display:inline-flex; align-items:center; gap:8px; cursor:pointer; font-family:'IBM Plex Mono',monospace;
+    background:var(--surface); border:1px solid var(--line-2); color:var(--ink); padding:9px 13px; border-radius:var(--r); font-size:.7rem; font-weight:600; letter-spacing:.08em; }
+  .tgl svg{ width:15px; height:15px; }
+  .tgl:focus-visible{ outline:2px solid var(--blue); outline-offset:2px; }
+
+  .concept{ margin:20px 0 6px; background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--signal); border-radius:var(--r);
+    padding:14px 16px; font-size:.82rem; color:var(--ink-soft); line-height:1.75; max-width:780px; }
+  .concept b{ color:var(--ink); }
+
+  .legend{ display:flex; gap:8px; flex-wrap:wrap; margin:14px 0 26px; }
+  .sw{ display:flex; align-items:center; gap:7px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:5px 11px 5px 6px;
+    font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--ink-soft); }
+  .sw i{ width:14px; height:14px; display:block; }
+
+  .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(342px,1fr)); gap:30px; }
+  .col{ display:flex; flex-direction:column; gap:10px; }
+  .cap{ font-family:'IBM Plex Mono',monospace; font-size:.7rem; color:var(--ink-soft); display:flex; align-items:center; gap:9px; letter-spacing:.04em; }
+  .cap b{ color:var(--signal); font-weight:700; }
+
+  /* ---------------- phone ---------------- */
+  .phone{ background:var(--ink); border-radius:6px; padding:7px; box-shadow:var(--shadow); }
+  .screen{
+    background-color:var(--paper); position:relative; border-radius:3px; height:690px; overflow:hidden; display:flex; flex-direction:column;
+    background-image:
+      linear-gradient(var(--grid) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid) 1px,transparent 1px),
+      linear-gradient(var(--grid-2) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid-2) 1px,transparent 1px);
+    background-size:16px 16px,16px 16px,80px 80px,80px 80px;
+  }
+  .scroll{ flex:1; overflow-y:auto; }
+  .scroll::-webkit-scrollbar{ width:0; }
+
+  /* registration-marked panel (corner brackets) */
+  .panel{ background:var(--panel); border:1px solid var(--line); border-radius:var(--r); position:relative; }
+  .panel::before,.panel::after{ content:""; position:absolute; width:7px; height:7px; pointer-events:none; }
+  .panel::before{ left:-1px; top:-1px; border-left:1.5px solid var(--line-2); border-top:1.5px solid var(--line-2); }
+  .panel::after{ right:-1px; bottom:-1px; border-right:1.5px solid var(--line-2); border-bottom:1.5px solid var(--line-2); }
+
+  /* topbar */
+  .bar{ background:var(--surface); border-bottom:1px solid var(--line-2); padding:12px 14px; position:sticky; top:0; z-index:6; }
+  .bar-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .op{ display:flex; align-items:center; gap:10px; }
+  .opchip{ width:36px; height:36px; flex:none; background:var(--ink); color:var(--surface); display:grid; place-items:center;
+    font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:.78rem; }
+  .op .nm{ font-weight:600; font-size:.88rem; line-height:1.1; }
+  .op .id{ font-family:'IBM Plex Mono',monospace; font-size:.6rem; color:var(--ink-faint); letter-spacing:.06em; margin-top:2px; }
+
+  /* miles readout (signature) */
+  .gauge{ text-align:right; }
+  .gauge .val{ font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:1.18rem; color:var(--signal); line-height:1; }
+  .gauge .val small{ font-size:.62rem; color:var(--ink-faint); font-weight:600; margin-left:3px; letter-spacing:.06em; }
+  .gauge .ticks{ margin-top:5px; height:7px; width:118px; display:flex; gap:2px; justify-content:flex-end; }
+  .gauge .ticks i{ width:2px; background:var(--line-2); align-self:flex-end; }
+
+  /* weekly target dimension line */
+  .wk{ margin-top:13px; padding-top:11px; border-top:1px dashed var(--line); }
+  .wk-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px; }
+  .wk-top .r{ font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--ink-soft); }
+  .wk-top .r b{ color:var(--signal); }
+  .dim{ position:relative; height:16px; }
+  .dim .axis{ position:absolute; left:0; right:0; top:7px; height:1px; background:var(--line-2); }
+  .dim .axis::before,.dim .axis::after{ content:""; position:absolute; top:-3px; width:1px; height:7px; background:var(--line-2); }
+  .dim .axis::before{ left:0; } .dim .axis::after{ right:0; }
+  .dim .prog{ position:absolute; left:0; width:65%; top:7px; height:1px; background:var(--signal); }
+  .dim .cur{ position:absolute; left:65%; top:1px; width:0; height:0; transform:translateX(-50%);
+    border-left:5px solid transparent; border-right:5px solid transparent; border-top:7px solid var(--signal); }
+  .dim .tgt{ position:absolute; right:-2px; top:-4px; color:var(--blue); }
+  .dim .tgt svg{ width:13px; height:13px; }
+
+  /* nav */
+  .nav{ display:flex; background:var(--surface); border-bottom:1px solid var(--line-2); }
+  .nav a{ flex:1; text-decoration:none; padding:9px 4px 7px; text-align:center; border-bottom:2px solid transparent;
+    display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--ink-faint); }
+  .nav a .t{ font-family:'IBM Plex Mono',monospace; font-size:.58rem; font-weight:600; letter-spacing:.1em; }
+  .nav a .j{ font-size:.68rem; font-weight:500; }
+  .nav a svg{ width:16px; height:16px; }
+  .nav a.on{ color:var(--ink); border-bottom-color:var(--blue); }
+  .nav a.on .t{ color:var(--blue); }
+  .nav a:focus-visible{ outline:2px solid var(--blue); outline-offset:-2px; }
+
+  /* ===== timeline / log (signature) ===== */
+  .log{ padding:14px 14px 22px; }
+  .cur-node{ display:grid; grid-template-columns:54px 1fr; align-items:center; margin-bottom:6px; }
+  .cur-node .rl{ display:flex; flex-direction:column; align-items:center; }
+  .cur-node .crh{ width:18px; height:18px; position:relative; }
+  .cur-node .crh::before,.cur-node .crh::after{ content:""; position:absolute; background:var(--blue); }
+  .cur-node .crh::before{ left:8px; top:0; width:2px; height:18px; }
+  .cur-node .crh::after{ top:8px; left:0; height:2px; width:18px; }
+  .cur-node .lab .t{ font-family:'IBM Plex Mono',monospace; font-size:.62rem; color:var(--blue); font-weight:700; letter-spacing:.08em; }
+  .cur-node .lab .s{ font-size:.66rem; color:var(--ink-soft); }
+
+  .reading{ display:grid; grid-template-columns:54px 1fr; align-items:stretch; }
+  .ruler{ position:relative; }
+  .ruler .spine{ position:absolute; left:26px; top:0; bottom:0; width:1px; background:var(--line-2); }
+  .ruler .tick{ position:absolute; left:18px; top:16px; width:9px; height:1px; background:var(--line-2); }
+  .ruler .node{ position:absolute; left:22px; top:12px; width:9px; height:9px; background:var(--surface); border:2px solid var(--signal); border-radius:50%; }
+  .ruler .cum{ position:absolute; left:0; top:26px; width:50px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:.54rem; color:var(--ink-faint); }
+  .rd{ margin:0 0 14px; padding:12px 13px; }
+  .rd-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .rd-vec{ font-family:'IBM Plex Mono',monospace; font-size:.58rem; letter-spacing:.06em; color:var(--ink-faint); }
+  .rd-vec b{ color:var(--ink-soft); }
+  .rd-time{ font-family:'IBM Plex Mono',monospace; font-size:.58rem; color:var(--ink-faint); }
+  .rd-who{ font-size:.82rem; margin-bottom:8px; }
+  .rd-who b{ font-weight:600; } .rd-who .ar{ color:var(--blue); margin:0 5px; } .rd-who .to{ color:var(--cyan); font-weight:600; }
+  .rd-val{ float:right; margin:-2px 0 4px 10px; font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:1.02rem; color:var(--signal); }
+  .rd-val small{ font-size:.58rem; color:var(--ink-faint); margin-left:2px; }
+  .rd-msg{ font-size:.84rem; line-height:1.7; }
+  .specs{ display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+  .spec{ font-family:'IBM Plex Mono',monospace; font-size:.6rem; color:var(--cyan); border:1px solid var(--line); border-radius:2px; padding:2px 7px; letter-spacing:.04em; }
+  .meta{ display:flex; gap:14px; margin-top:11px; padding-top:9px; border-top:1px dashed var(--line); }
+  .meta button{ background:none; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:5px; padding:0;
+    font-family:'IBM Plex Mono',monospace; font-size:.64rem; font-weight:600; color:var(--ink-soft); }
+  .meta button.on{ color:var(--signal); }
+  .meta svg{ width:13px; height:13px; }
+  .meta button:focus-visible{ outline:2px solid var(--blue); outline-offset:2px; }
+
+  /* buttons */
+  .btn{ width:100%; border:1px solid transparent; border-radius:var(--r); padding:13px; cursor:pointer; font-family:'Space Grotesk',sans-serif;
+    font-weight:600; font-size:.92rem; letter-spacing:.02em; display:flex; align-items:center; justify-content:center; gap:9px; transition:opacity .15s ease; }
+  .btn:active{ opacity:.85; }
+  .btn:focus-visible{ outline:2px solid var(--blue); outline-offset:2px; }
+  .btn svg{ width:17px; height:17px; }
+  .btn-blue{ background:var(--blue); color:#fff; }
+  .btn-signal{ background:var(--signal); color:#fff; }
+  .btn-ghost{ background:var(--surface); color:var(--ink); border-color:var(--line-2); }
+  .btn .k{ font-family:'IBM Plex Mono',monospace; font-size:.66rem; opacity:.85; }
+
+  /* ===== login ===== */
+  .lg{ flex:1; display:flex; flex-direction:column; padding:24px 22px 18px; }
+  .lg-hero{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:11px; }
+  .lg-mk{ width:64px; height:64px; background:var(--ink); position:relative; }
+  .lg-mk svg{ position:absolute; inset:0; margin:auto; }
+  .lg-title{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.55rem; letter-spacing:.04em; }
+  .lg-tag{ color:var(--ink-soft); font-size:.84rem; line-height:1.7; }
+  .plot{ margin:6px 0 2px; }
+  .fld{ margin-top:11px; text-align:left; }
+  .fld label{ display:block; font-family:'IBM Plex Mono',monospace; font-size:.6rem; font-weight:600; color:var(--ink-soft); margin-bottom:5px; letter-spacing:.1em; }
+  .inp{ width:100%; background:var(--surface); border:1px solid var(--line-2); border-radius:var(--r); padding:11px 12px; font-family:'IBM Plex Mono',monospace; font-size:.82rem; color:var(--ink); }
+  .inp:focus-visible{ outline:none; border-color:var(--blue); }
+  .sep{ display:flex; align-items:center; gap:10px; color:var(--ink-faint); font-family:'IBM Plex Mono',monospace; font-size:.6rem; letter-spacing:.1em; margin:14px 0; }
+  .sep::before,.sep::after{ content:""; flex:1; height:1px; background:var(--line); }
+  .lg-foot{ text-align:center; font-size:.74rem; color:var(--ink-soft); margin-top:14px; }
+  .lg-foot a{ color:var(--blue); font-weight:600; text-decoration:none; }
+  /* drawing title block */
+  .titleblock{ display:grid; grid-template-columns:repeat(3,1fr); border:1px solid var(--line-2); margin-top:16px; }
+  .titleblock div{ padding:6px 8px; border-right:1px solid var(--line); font-family:'IBM Plex Mono',monospace; }
+  .titleblock div:last-child{ border-right:none; }
+  .titleblock .k{ font-size:.5rem; color:var(--ink-faint); letter-spacing:.1em; }
+  .titleblock .v{ font-size:.64rem; color:var(--ink-soft); margin-top:2px; }
+
+  /* ===== post ===== */
+  .post{ padding:15px; display:flex; flex-direction:column; gap:15px; }
+  .sh{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .sh .n{ font-family:'IBM Plex Mono',monospace; font-size:.56rem; color:var(--ink-faint); letter-spacing:.06em; }
+  .sh .t{ font-family:'IBM Plex Mono',monospace; font-size:.62rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); }
+  .target{ display:flex; align-items:center; gap:11px; padding:11px; border-left:3px solid var(--cyan); }
+  .target .opchip{ background:var(--cyan); }
+  .target .meta2{ flex:1; } .target .meta2 .n{ font-weight:600; font-size:.85rem; } .target .meta2 .d{ font-family:'IBM Plex Mono',monospace; font-size:.6rem; color:var(--ink-soft); }
+  .ta{ width:100%; min-height:100px; resize:none; background:var(--panel); border:1px solid var(--line-2); border-radius:var(--r); padding:12px; font-family:inherit; font-size:.85rem; color:var(--ink); line-height:1.75; }
+  .ta:focus-visible{ outline:none; border-color:var(--blue); }
+  .seg{ display:flex; }
+  .seg .o{ flex:1; text-align:center; padding:12px 4px 9px; border:1px solid var(--line-2); border-left:none; cursor:pointer; background:var(--surface); }
+  .seg .o:first-child{ border-left:1px solid var(--line-2); }
+  .seg .o .v{ font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:1.08rem; }
+  .seg .o .u{ display:block; font-family:'IBM Plex Mono',monospace; font-size:.54rem; color:var(--ink-faint); letter-spacing:.08em; margin-top:1px; }
+  .seg .o.on{ background:var(--signal-soft); border-color:var(--signal); position:relative; z-index:1; }
+  .seg .o.on .v{ color:var(--signal); }
+  .tagpick{ display:flex; gap:7px; flex-wrap:wrap; }
+  .tp{ font-family:'IBM Plex Mono',monospace; font-size:.64rem; padding:6px 11px; border-radius:2px; border:1px solid var(--line-2); background:var(--surface); color:var(--ink-soft); cursor:pointer; letter-spacing:.03em; }
+  .tp.on{ border-color:var(--cyan); color:var(--cyan); background:var(--blue-soft); }
+
+  /* ===== gacha / reward module ===== */
+  .gc{ padding:15px; display:flex; flex-direction:column; gap:14px; }
+  .module{ padding:18px 15px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:13px; border-top:3px solid var(--blue); }
+  .module .dial{ position:relative; width:128px; height:128px; }
+  .module .odds{ font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--ink-soft); letter-spacing:.04em; }
+  .module .odds b{ color:var(--blue); }
+  .row-h{ display:flex; align-items:center; justify-content:space-between; }
+  .row-h span{ font-family:'IBM Plex Mono',monospace; font-size:.62rem; color:var(--ink-soft); letter-spacing:.06em; }
+  .acq{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:11px; padding:10px 12px; }
+  .grade{ font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:.58rem; color:#fff; padding:3px 6px; border-radius:2px; letter-spacing:.06em; }
+  .g-n{ background:var(--ink-faint); } .g-r{ background:var(--cyan); } .g-sr{ background:var(--signal); } .g-ur{ background:var(--blue); }
+  .acq .an{ font-size:.82rem; font-weight:600; } .acq .as{ font-family:'IBM Plex Mono',monospace; font-size:.58rem; color:var(--ink-soft); }
+  .acq .aw{ font-family:'IBM Plex Mono',monospace; font-size:.56rem; color:var(--ink-faint); }
+
+  .footnote{ text-align:center; color:var(--ink-faint); font-family:'IBM Plex Mono',monospace; font-size:.66rem; letter-spacing:.04em; margin-top:30px; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div class="brand">
+      <div class="mk">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="var(--signal)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="6"/><path d="M12 0v5M12 19v5M0 12h5M19 12h5"/></svg>
+      </div>
+      <div>
+        <h1>GROWTH MILE</h1>
+        <div class="sub disp">Growth Telemetry — 成長を計測する ／ ブループリント版 ／ 全4画面</div>
+      </div>
+    </div>
+    <button class="tgl" id="tgl"><span id="tglIcon"></span><span id="tglTxt">DARK</span></button>
+  </div>
+
+  <div class="concept">
+    コンセプト: <b>チームの成長を測る精密計器</b>。GROWTH MILE の "mile" を距離/計測ととらえ、感謝を <b>計測値(reading)</b>、ポイントを <b>走行マイル</b>、タイムラインを <b>計測ログ</b> として表現。<b>製図用紙の方眼・ヘアライン罫・レジストレーションマーク・モノスペースの数値読み</b> で硬質に構成し、署名要素を <b>マイルのゲージ／寸法ルーラー</b> に絞った。ライト=製図ヴェラム、ダーク=サイアノタイプ。蛍光ではなく <b>計器アンバー(数値)＋技術ブルー(操作)</b> のみを差し色に。
+  </div>
+
+  <div class="legend">
+    <span class="sw"><i style="background:var(--ink)"></i>Ink / Graphite</span>
+    <span class="sw"><i style="background:var(--blue)"></i>Blue / 操作</span>
+    <span class="sw"><i style="background:var(--signal)"></i>Signal / マイル値</span>
+    <span class="sw"><i style="background:var(--cyan)"></i>Cyan / 計測タグ</span>
+    <span class="sw">Space Grotesk + IBM Plex Sans JP + IBM Plex Mono</span>
+  </div>
+
+  <div class="grid">
+
+    <!-- ====== LOGIN ====== -->
+    <div class="col">
+      <div class="cap"><b>SHEET 01</b> ログイン — 計器の起動</div>
+      <div class="phone"><div class="screen">
+        <div class="lg">
+          <div class="lg-hero">
+            <div class="lg-mk">
+              <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="var(--signal)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>
+            </div>
+            <div class="lg-title">GROWTH MILE</div>
+            <div class="lg-tag">ありがとうを計測し、<br>チームの成長を可視化する。</div>
+            <div class="plot">
+              <svg viewBox="0 0 240 84" width="240" height="84" fill="none">
+                <line x1="20" y1="6" x2="20" y2="70" stroke="var(--line-2)" stroke-width="1"/>
+                <line x1="20" y1="70" x2="228" y2="70" stroke="var(--line-2)" stroke-width="1"/>
+                <g stroke="var(--line)" stroke-width="1">
+                  <line x1="20" y1="54" x2="228" y2="54"/><line x1="20" y1="38" x2="228" y2="38"/><line x1="20" y1="22" x2="228" y2="22"/>
+                  <line x1="72" y1="6" x2="72" y2="70"/><line x1="124" y1="6" x2="124" y2="70"/><line x1="176" y1="6" x2="176" y2="70"/>
+                </g>
+                <path d="M20 66 L72 56 L124 40 L176 24 L224 12" stroke="var(--signal)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                <g fill="var(--paper)" stroke="var(--signal)" stroke-width="2">
+                  <circle cx="72" cy="56" r="3"/><circle cx="124" cy="40" r="3"/><circle cx="176" cy="24" r="3"/><circle cx="224" cy="12" r="3"/>
+                </g>
+                <text x="18" y="82" font-family="IBM Plex Mono" font-size="7" fill="var(--ink-faint)">WEEK 01</text>
+                <text x="200" y="82" font-family="IBM Plex Mono" font-size="7" fill="var(--ink-faint)">NOW</text>
+              </svg>
+            </div>
+          </div>
+          <div>
+            <div class="fld"><label>OPERATOR ID</label><input class="inp" value="hana@growthmile.jp" /></div>
+            <div class="fld"><label>PASSCODE</label><input class="inp" type="password" value="passwordmock" /></div>
+            <button class="btn btn-blue" style="margin-top:14px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg>
+              ログイン<span class="k">[ENTER]</span>
+            </button>
+            <div class="sep">OR</div>
+            <button class="btn btn-ghost">
+              <svg viewBox="0 0 24 24" width="17" height="17"><path fill="#EA4335" d="M12 11v3.6h5.1c-.2 1.3-1.6 3.9-5.1 3.9-3.1 0-5.6-2.5-5.6-5.6S8.9 7.3 12 7.3c1.7 0 2.9.7 3.6 1.4l2.5-2.4C16.5 4.7 14.5 4 12 4 7 4 3 8 3 13s4 9 9 9c5.2 0 8.6-3.6 8.6-8.7 0-.6 0-1-.1-1.5H12z"/></svg>
+              Google で認証
+            </button>
+            <div class="lg-foot">未登録の方は <a href="#">アカウント発行</a></div>
+            <div class="titleblock">
+              <div><div class="k">PROJECT</div><div class="v">GROWTH MILE</div></div>
+              <div><div class="k">SHEET</div><div class="v">01 / AUTH</div></div>
+              <div><div class="k">REV</div><div class="v">2.0</div></div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ====== TIMELINE / LOG ====== -->
+    <div class="col">
+      <div class="cap"><b>SHEET 02</b> タイムライン — 計測ログ（署名画面）</div>
+      <div class="phone"><div class="screen">
+        <div class="bar">
+          <div class="bar-row">
+            <div class="op">
+              <div class="opchip">YH</div>
+              <div><div class="nm">山田 花</div><div class="id">OP-0427 / 探検家 LV.7</div></div>
+            </div>
+            <div class="gauge">
+              <div class="ey" style="margin-bottom:3px;">TOTAL MILES</div>
+              <div class="val">1,240<small>mi</small></div>
+              <div class="ticks"><i style="height:3px"></i><i style="height:5px"></i><i style="height:4px"></i><i style="height:6px"></i><i style="height:5px"></i><i style="height:7px"></i><i style="height:5px"></i><i style="height:6px"></i></div>
+            </div>
+          </div>
+          <div class="wk">
+            <div class="wk-top"><span class="ey">WEEKLY TARGET</span><span class="r"><b>13</b> / 20 mi → REWARD</span></div>
+            <div class="dim">
+              <div class="axis"></div><div class="prog"></div><div class="cur"></div>
+              <span class="tgt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg></span>
+            </div>
+          </div>
+        </div>
+        <nav class="nav">
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l5-6 4 3 5-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 21h18"/></svg><span class="t">LOG</span><span class="j">道のり</span></a>
+          <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M13 7l6 5-6 5"/></svg><span class="t">DISPATCH</span><span class="j">送信</span></a>
+          <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="16" height="11"/><path d="M4 13h16M12 9v11"/><path d="M8 9a4 4 0 0 1 8 0"/></svg><span class="t">REWARDS</span><span class="j">報酬</span></a>
+        </nav>
+        <div class="scroll">
+          <div class="log">
+
+            <div class="cur-node">
+              <div class="rl"><div class="crh"></div></div>
+              <div class="lab"><div class="t">CURRENT · 1,240 mi</div><div class="s">あなたの現在地</div></div>
+            </div>
+
+            <div class="reading">
+              <div class="ruler"><div class="spine"></div><div class="tick"></div><div class="node"></div><div class="cum">+30</div></div>
+              <div class="panel rd">
+                <div class="rd-top"><span class="rd-vec"><b>K.OHNO</b> → YOU</span><span class="rd-time">TODAY 09:42 · #R-2231</span></div>
+                <div class="rd-val">+30<small>mi</small></div>
+                <div class="rd-who"><b>大野 健</b><span class="ar">→</span><span class="to">あなた</span></div>
+                <div class="rd-msg">リリース前の深夜対応、本当に助かりました。おかげで無事ローンチできたよ。次は私が引っ張ります。</div>
+                <div class="specs"><span class="spec">CHEMISTRY</span><span class="spec">RELIABLE</span></div>
+                <div class="meta">
+                  <button class="on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>12</button>
+                  <button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-6 0v4H5l1 11h12l1-11z"/></svg>5</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="reading">
+              <div class="ruler"><div class="spine"></div><div class="tick"></div><div class="node"></div><div class="cum">+50</div></div>
+              <div class="panel rd">
+                <div class="rd-top"><span class="rd-vec"><b>M.SATO</b> → S.TANAKA</span><span class="rd-time">TODAY 08:15 · #R-2230</span></div>
+                <div class="rd-val">+50<small>mi</small></div>
+                <div class="rd-who"><b>佐藤 美咲</b><span class="ar">→</span><span class="to">田中 翔</span></div>
+                <div class="rd-msg">新人さんへのオンボーディング資料、すごく分かりやすかったです。丁寧さに感謝。</div>
+                <div class="specs"><span class="spec">KIND</span><span class="spec">KNOWLEDGE</span></div>
+                <div class="meta">
+                  <button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>8</button>
+                  <button class="on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 9V5a3 3 0 0 0-6 0v4H5l1 11h12l1-11z"/></svg>3</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="reading">
+              <div class="ruler"><div class="spine"></div><div class="tick"></div><div class="node"></div><div class="cum">+10</div></div>
+              <div class="panel rd">
+                <div class="rd-top"><span class="rd-vec"><b>S.TANAKA</b> → YOU</span><span class="rd-time">YDAY 18:03 · #R-2229</span></div>
+                <div class="rd-val">+10<small>mi</small></div>
+                <div class="rd-who"><b>田中 翔</b><span class="ar">→</span><span class="to">あなた</span></div>
+                <div class="rd-msg">いつも明るく声をかけてくれてありがとう。チームの雰囲気が良くなってます。</div>
+                <div class="specs"><span class="spec">MOOD-MAKER</span></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ====== POST / DISPATCH ====== -->
+    <div class="col">
+      <div class="cap"><b>SHEET 03</b> 送信 — 感謝を計測して送る</div>
+      <div class="phone"><div class="screen">
+        <div class="bar">
+          <div class="bar-row">
+            <div class="op"><div class="opchip">TX</div><div><div class="nm">DISPATCH</div><div class="id">手持ち 400 mi まで送信可</div></div></div>
+            <div class="gauge"><div class="ey" style="margin-bottom:3px;">PENDING</div><div class="val">+30<small>mi</small></div></div>
+          </div>
+        </div>
+        <div class="scroll">
+          <div class="post">
+            <div>
+              <div class="sh"><span class="n">01</span><span class="t">Recipient</span></div>
+              <div class="panel target">
+                <div class="opchip">KO</div>
+                <div class="meta2"><div class="n">大野 健</div><div class="d">DEV TEAM / OP-0318</div></div>
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--cyan)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+            <div>
+              <div class="sh"><span class="n">02</span><span class="t">Message</span></div>
+              <textarea class="ta">リリース前の深夜対応、本当に助かりました。おかげで無事ローンチできたよ。</textarea>
+            </div>
+            <div>
+              <div class="sh"><span class="n">03</span><span class="t">Miles to send</span></div>
+              <div class="seg">
+                <div class="o"><span class="v">10</span><span class="u">mi</span></div>
+                <div class="o on"><span class="v">30</span><span class="u">mi</span></div>
+                <div class="o"><span class="v">50</span><span class="u">mi</span></div>
+              </div>
+            </div>
+            <div>
+              <div class="sh"><span class="n">04</span><span class="t">Tags</span></div>
+              <div class="tagpick">
+                <span class="tp on">CHEMISTRY</span><span class="tp on">RELIABLE</span>
+                <span class="tp">KIND</span><span class="tp">CHALLENGE</span>
+              </div>
+            </div>
+            <button class="btn btn-blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>
+              感謝を送信<span class="k">+30 mi</span>
+            </button>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ====== GACHA / REWARD MODULE ====== -->
+    <div class="col">
+      <div class="cap"><b>SHEET 04</b> 報酬 — リワードモジュール</div>
+      <div class="phone"><div class="screen">
+        <div class="bar">
+          <div class="bar-row">
+            <div class="op"><div class="opchip">RW</div><div><div class="nm">REWARD MODULE</div><div class="id">マイルを較正して交換</div></div></div>
+            <div class="gauge"><div class="ey" style="margin-bottom:3px;">BALANCE</div><div class="val">1,240<small>mi</small></div></div>
+          </div>
+        </div>
+        <div class="scroll">
+          <div class="gc">
+            <div class="panel module">
+              <div class="dial">
+                <svg viewBox="0 0 128 128" width="128" height="128" fill="none">
+                  <circle cx="64" cy="64" r="52" stroke="var(--line-2)" stroke-width="1"/>
+                  <circle cx="64" cy="64" r="44" stroke="var(--line)" stroke-width="1"/>
+                  <g stroke="var(--line-2)" stroke-width="1.5">
+                    <line x1="64" y1="12" x2="64" y2="20"/><line x1="116" y1="64" x2="108" y2="64"/>
+                    <line x1="64" y1="116" x2="64" y2="108"/><line x1="12" y1="64" x2="20" y2="64"/>
+                  </g>
+                  <path d="M64 64 L92 40" stroke="var(--signal)" stroke-width="3" stroke-linecap="round"/>
+                  <circle cx="64" cy="64" r="6" fill="var(--surface)" stroke="var(--blue)" stroke-width="3"/>
+                  <text x="64" y="98" font-family="IBM Plex Mono" font-size="9" fill="var(--ink-soft)" text-anchor="middle">CALIBRATED</text>
+                </svg>
+              </div>
+              <div class="odds">P( ≥ SR ) = <b>0.15</b> &nbsp;·&nbsp; COST 100 mi</div>
+              <button class="btn btn-signal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+                抽選を実行<span class="k">-100 mi</span>
+              </button>
+            </div>
+
+            <div class="row-h"><span class="ey">RECENT ACQUISITIONS</span><span>すべて見る</span></div>
+
+            <div class="panel acq"><span class="grade g-ur">UR</span><div><div class="an">限定スタンプ「ありがとう侍」</div><div class="as">RARE DROP · COLLECTION +1</div></div><span class="aw">2 MIN</span></div>
+            <div class="panel acq"><span class="grade g-sr">SR</span><div><div class="an">カフェチケット 500 円</div><div class="as">REDEEMABLE</div></div><span class="aw">YDAY</span></div>
+            <div class="panel acq"><span class="grade g-r">R</span><div><div class="an">プロフィール用フレーム</div><div class="as">EQUIPPABLE</div></div><span class="aw">3 DAY</span></div>
+            <div class="panel acq"><span class="grade g-n">N</span><div><div class="an">ボーナス 20 mi</div><div class="as">CREDITED</div></div><span class="aw">3 DAY</span></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+  </div>
+
+  <div class="footnote">data-theme トグルで LIGHT(製図ヴェラム) ⇄ DARK(サイアノタイプ) を切替 · 色は全て CSS 変数 · サーバー不要</div>
+</div>
+
+<script>
+  const sun='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  const moon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+  const root=document.documentElement, ic=document.getElementById('tglIcon'), tx=document.getElementById('tglTxt');
+  function apply(t){ root.setAttribute('data-theme',t); ic.innerHTML=t==='light'?moon:sun; tx.textContent=t==='light'?'DARK':'LIGHT'; }
+  apply('light');
+  document.getElementById('tgl').addEventListener('click',()=>apply(root.getAttribute('data-theme')==='light'?'dark':'light'));
+</script>
+</body>
+</html>
