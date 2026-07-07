@@ -20,6 +20,8 @@ Next.js 16 (App Router) / TypeScript / Tailwind CSS v4 / Prisma / NextAuth.js / 
 
 ## セットアップ
 
+前提: Node.js 24（`.nvmrc` 参照）と Docker がインストール済みであること。
+
 ### 1. 依存関係インストール
 
 ```bash
@@ -31,8 +33,8 @@ cd e2e && npm install && cd ..
 
 ### 2. 環境変数
 
-[`.env.example`](.env.example) をコピーして `.env` を作成し、`DATABASE_URL` / `NEXTAUTH_URL` / `NEXTAUTH_SECRET` を設定してください。
-`NEXTAUTH_SECRET` は `openssl rand -base64 32` などで 32 文字以上を生成します。
+[`.env.example`](.env.example) をコピーして `.env` を作成し、`DATABASE_URL` / `AUTH_SECRET`（必要に応じて `AUTH_URL`）を設定してください。
+`AUTH_SECRET` は `openssl rand -base64 32` などで 32 文字以上を生成します（Auth.js v5 の正式名。旧 `NEXTAUTH_*` もフォールバックで動作します）。
 
 ### 3. ローカル DB 起動 と マイグレーション
 

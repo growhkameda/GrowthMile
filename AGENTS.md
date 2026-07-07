@@ -71,6 +71,8 @@ npx markdownlint-cli "docs/**/*.md" --fix
 | `incident-response` | バグ調査・障害対応・根本原因分析をするとき |
 | `rework-report` | E2E / ST 失敗・NEEDS_HUMAN_REVIEW 時に Evidence Bundle を保存するとき |
 | `frontend-design` | 新規 UI のビジュアルデザインを検討するとき |
+| `slide-design-themes` | スライド資料を作成するとき（tech-dark / enterprise-light をユーザーに選択させる） |
+| `dev-diagrams` | アーキテクチャ図・ER図・シーケンス図・画面遷移図・フローチャートを作成するとき |
 
 タスク受領時は `.claude/rules/core-cognition.md` の複雑度トリアージ（LIGHT / STANDARD / COMPLEX）を必ず実施し、判定に応じたプロセスを適用する。
 

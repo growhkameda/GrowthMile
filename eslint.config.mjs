@@ -18,6 +18,8 @@ const eslintConfig = defineConfig([
     "employee-appreciation-app/**",
     // Prisma generated client
     "src/generated/**",
+    // Claude Code skill assets (standalone Node scripts, not app code)
+    ".claude/**",
   ]),
 ])
 

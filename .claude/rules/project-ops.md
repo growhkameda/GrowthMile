@@ -39,7 +39,6 @@ cd e2e && npx playwright test   # アプリ起動中に実行
 | セキュリティ | `secrets-scan`（gitleaks）/ `hardcoded-credentials` |
 | E2E | `detect-e2e` / `e2e-playwright` |
 | デプロイ | `deploy-staging`（main push）/ `deploy-production`（workflow_dispatch・人間の手動トリガーのみ） |
-| 図生成 | `generate-diagrams`（Mermaid PNG 生成。廃止候補・削除する場合はジョブごと除去） |
 
 ## 参照ドキュメント
 
